@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 
-export default function TaskCard({ task, onUpdate, onDelete }) {
+export default function TaskCard({ task, onUpdate, onDelete, isDragging = false }) {
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -48,7 +48,11 @@ export default function TaskCard({ task, onUpdate, onDelete }) {
     : null;
 
   return (
-    <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-4 cursor-grab active:cursor-grabbing hover:border-purple-500/50 transition-all group">
+    <div className={`bg-[#1a1a2e] border rounded-xl p-4 cursor-grab active:cursor-grabbing transition-all group ${
+      isDragging 
+        ? 'border-purple-500 shadow-lg shadow-purple-500/20 ring-2 ring-purple-500/30' 
+        : 'border-white/10 hover:border-purple-500/50'
+    }`}>
       {/* Labels */}
       {task.labels && task.labels.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-3">

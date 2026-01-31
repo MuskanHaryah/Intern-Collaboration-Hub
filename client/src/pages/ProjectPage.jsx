@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { KanbanBoard, AddTaskModal } from '../components/Kanban';
+import { KanbanBoard } from '../components/Kanban';
 
 export default function ProjectPage() {
   const { projectId } = useParams();
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showAddTask, setShowAddTask] = useState(false);
-  const [activeColumn, setActiveColumn] = useState(null);
   const [viewMode, setViewMode] = useState('board'); // board, list, timeline
 
   // Mock data for now - will be replaced with API calls
@@ -162,11 +159,6 @@ export default function ProjectPage() {
         t.id === taskId ? { ...t, column: newColumn, order: newOrder } : t
       )
     );
-  };
-
-  const openAddTaskModal = (columnId) => {
-    setActiveColumn(columnId);
-    setShowAddTask(true);
   };
 
   if (loading) {
@@ -346,24 +338,13 @@ export default function ProjectPage() {
         <KanbanBoard
           columns={project.taskColumns}
           tasks={tasks}
-          onAddTask={openAddTaskModal}
+          onAddTask={handleAddTask}
           onUpdateTask={handleUpdateTask}
           onDeleteTask={handleDeleteTask}
           onMoveTask={handleMoveTask}
+          projectMembers={project.members}
         />
       </main>
-
-      {/* Add Task Modal */}
-      <AddTaskModal
-        isOpen={showAddTask}
-        onClose={() => {
-          setShowAddTask(false);
-          setActiveColumn(null);
-        }}
-        onSubmit={handleAddTask}
-        columnId={activeColumn}
-        projectMembers={project.members}
-      />
     </div>
   );
 }
