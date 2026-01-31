@@ -7,6 +7,7 @@ import { Server } from 'socket.io';
 
 import config from './config/index.js';
 import connectDB from './config/database.js';
+import authRoutes from './routes/auth.js';
 
 // Initialize Express app
 const app = express();
@@ -46,8 +47,8 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// API Routes (will be added later)
-// app.use('/api/auth', authRoutes);
+// API Routes
+app.use('/api/auth', authRoutes);
 // app.use('/api/projects', projectRoutes);
 // app.use('/api/tasks', taskRoutes);
 // app.use('/api/milestones', milestoneRoutes);
