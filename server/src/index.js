@@ -10,6 +10,7 @@ import connectDB from './config/database.js';
 import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
 import taskRoutes from './routes/tasks.js';
+import { setupSocketHandlers } from './socket/index.js';
 
 // Initialize Express app
 const app = express();
@@ -54,27 +55,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 
-// Socket.IO connection handling
-io.on('connection', (socket) => {
-  console.log(`🔌 User connected: ${socket.id}`);
-
-  // Join project room
-  socket.on('join-project', (projectId) => {
-    socket.join(`project-${projectId}`);
-    console.log(`👤 User ${socket.id} joined project: ${projectId}`);
-  });
-
-  // Leave project room
-  socket.on('leave-project', (projectId) => {
-    socket.leave(`project-${projectId}`);
-    console.log(`👤 User ${socket.id} left project: ${projectId}`);
-  });
-
-  // Handle disconnect
-  socket.on('disconnect', () => {
-    console.log(`🔌 User disconnected: ${socket.id}`);
-  });
-});
+// Setup Socket.IO handlers with authentication
+setupSocketHandlers(io);
 
 // 404 handler
 app.use((req, res) => {
