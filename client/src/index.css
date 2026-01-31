@@ -1,9 +1,9 @@
+/* Import fonts - must be first */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 /* Base styles */
 * {
@@ -17,6 +17,51 @@ body {
   background-color: #0a0a0f;
   color: #ffffff;
   overflow-x: hidden;
+  cursor: none;
+}
+
+/* Small cursor dot */
+.cursor-dot {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background: #ffffff;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s ease, background 0.15s ease;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.cursor-dot.hovering {
+  transform: translate(-50%, -50%) scale(1.5);
+  background: #b026ff;
+  box-shadow: 0 0 20px rgba(176, 38, 255, 0.8);
+}
+
+/* Large ambient glow - appears near robot */
+.cursor-ambient-glow {
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(176, 38, 255, 0.25) 0%, rgba(255, 45, 149, 0.1) 40%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  filter: blur(30px);
+}
+
+.cursor-ambient-glow.visible {
+  opacity: 1;
+}
+
+/* Restore cursor for interactive elements */
+a, button, input, textarea, select, [role="button"] {
+  cursor: none;
 }
 
 /* Custom scrollbar */

@@ -1,6 +1,6 @@
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Environment, ContactShadows, OrbitControls } from '@react-three/drei';
+import { Environment } from '@react-three/drei';
 import { useMousePosition } from '../../hooks/useMousePosition';
 import { SimpleRobot } from './SimpleRobot';
 
@@ -8,89 +8,50 @@ import { SimpleRobot } from './SimpleRobot';
 function Loader() {
   return (
     <mesh>
-      <boxGeometry args={[0.5, 0.5, 0.5]} />
-      <meshStandardMaterial color="#b026ff" wireframe />
+      <octahedronGeometry args={[0.3, 0]} />
+      <meshStandardMaterial color="#ffffff" wireframe />
     </mesh>
   );
 }
 
 export function RobotScene() {
   const mousePosition = useMousePosition();
-  const [useCustomModel, setUseCustomModel] = useState(false);
-  const [Robot, setRobot] = useState(null);
-
-  // Try to load custom robot model
-  useEffect(() => {
-    // Check if custom model exists
-    fetch('/models/robot.glb', { method: 'HEAD' })
-      .then((response) => {
-        if (response.ok) {
-          // Dynamically import the Robot component
-          import('./Robot').then((module) => {
-            setRobot(() => module.Robot);
-            setUseCustomModel(true);
-          });
-        }
-      })
-      .catch(() => {
-        // Use fallback SimpleRobot
-        setUseCustomModel(false);
-      });
-  }, []);
 
   return (
     <div 
-      className="absolute right-0 top-0 w-full md:w-1/2 h-screen"
+      className="absolute right-0 top-0 w-full md:w-[55%] h-screen"
       style={{ pointerEvents: 'none' }}
     >
       <Canvas
-        camera={{ position: [0, 0, 5], fov: 50 }}
+        camera={{ position: [0, 1, 6], fov: 45 }}
         style={{ background: 'transparent' }}
-        gl={{ alpha: true, antialias: true }}
+        gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
       >
         <Suspense fallback={<Loader />}>
-          {/* Lighting */}
-          <ambientLight intensity={0.4} />
+          {/* Very subtle ambient */}
+          <ambientLight intensity={0.15} />
           
-          {/* Main spotlight with purple tint */}
+          {/* Main key light - top right, white */}
           <spotLight
-            position={[5, 10, 7]}
-            angle={0.3}
+            position={[5, 8, 5]}
+            angle={0.4}
             penumbra={1}
-            intensity={1}
-            color="#b026ff"
-            castShadow
+            intensity={1.2}
+            color="#ffffff"
           />
           
-          {/* Secondary light - pink accent */}
-          <pointLight position={[-5, 5, 5]} color="#ff2d95" intensity={0.5} />
+          {/* Soft fill from left */}
+          <pointLight position={[-4, 2, 2]} color="#ffffff" intensity={0.3} />
           
-          {/* Rim light - cyan */}
-          <pointLight position={[0, -3, -5]} color="#00d4ff" intensity={0.3} />
+          {/* Subtle rim light from behind */}
+          <pointLight position={[0, 2, -4]} color="#ffffff" intensity={0.2} />
 
-          {/* Robot - use custom model if available, otherwise geometric */}
-          {useCustomModel && Robot ? (
-            <Robot mousePosition={mousePosition} />
-          ) : (
-            <SimpleRobot mousePosition={mousePosition} />
-          )}
+          {/* Robot with built-in cursor spotlight */}
+          <SimpleRobot mousePosition={mousePosition} />
 
-          {/* Environment for reflections */}
-          <Environment preset="night" />
-
-          {/* Shadow */}
-          <ContactShadows
-            position={[0, -2, 0]}
-            opacity={0.4}
-            scale={10}
-            blur={2.5}
-            far={4}
-            color="#b026ff"
-          />
+          {/* HDR environment for chrome reflections */}
+          <Environment preset="studio" />
         </Suspense>
-
-        {/* Optional: Enable orbit controls for debugging */}
-        {/* <OrbitControls enableZoom={false} /> */}
       </Canvas>
     </div>
   );
