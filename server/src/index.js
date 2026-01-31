@@ -8,6 +8,8 @@ import { Server } from 'socket.io';
 import config from './config/index.js';
 import connectDB from './config/database.js';
 import authRoutes from './routes/auth.js';
+import projectRoutes from './routes/projects.js';
+import taskRoutes from './routes/tasks.js';
 
 // Initialize Express app
 const app = express();
@@ -49,9 +51,8 @@ app.get('/api/health', (req, res) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
-// app.use('/api/projects', projectRoutes);
-// app.use('/api/tasks', taskRoutes);
-// app.use('/api/milestones', milestoneRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/tasks', taskRoutes);
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
