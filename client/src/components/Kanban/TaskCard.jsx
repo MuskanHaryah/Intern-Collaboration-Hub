@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { EditingIndicator } from '../UI';
 
-export default function TaskCard({ task, onUpdate, onDelete, isDragging = false }) {
+export default function TaskCard({ task, onUpdate, onDelete, isDragging = false, editingUsers = [] }) {
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -48,11 +49,18 @@ export default function TaskCard({ task, onUpdate, onDelete, isDragging = false 
     : null;
 
   return (
-    <div className={`bg-[#1a1a2e] border rounded-xl p-4 cursor-grab active:cursor-grabbing transition-all group ${
+    <div className={`bg-[#1a1a2e] border rounded-xl p-4 cursor-grab active:cursor-grabbing transition-all group relative ${
       isDragging 
         ? 'border-purple-500 shadow-lg shadow-purple-500/20 ring-2 ring-purple-500/30' 
         : 'border-white/10 hover:border-purple-500/50'
-    }`}>
+    } ${editingUsers.length > 0 ? 'ring-2 ring-cyan-500/30' : ''}`}>
+      {/* Editing Indicator */}
+      {editingUsers.length > 0 && (
+        <div className="absolute -top-2 right-2 z-10">
+          <EditingIndicator users={editingUsers} />
+        </div>
+      )}
+
       {/* Labels */}
       {task.labels && task.labels.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-3">

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { KanbanBoard } from '../components/Kanban';
+import { useSocket } from '../socket';
+import { OnlineUsers } from '../components/UI';
 
 export default function ProjectPage() {
   const { projectId } = useParams();
@@ -8,6 +10,20 @@ export default function ProjectPage() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('board'); // board, list, timeline
+  const { joinProjectRoom, leaveProjectRoom, onlineUsers, isConnected } = useSocket();
+
+  // Join project room on mount, leave on unmount
+  useEffect(() => {
+    if (projectId && isConnected) {
+      joinProjectRoom(projectId);
+    }
+    
+    return () => {
+      if (projectId) {
+        leaveProjectRoom(projectId);
+      }
+    };
+  }, [projectId, isConnected, joinProjectRoom, leaveProjectRoom]);
 
   // Mock data for now - will be replaced with API calls
   useEffect(() => {
@@ -239,6 +255,17 @@ export default function ProjectPage() {
 
             {/* Right: Actions */}
             <div className="flex items-center gap-3">
+              {/* Online Users */}
+              <OnlineUsers users={onlineUsers} />
+
+              {/* Connection Status */}
+              <div className="flex items-center gap-1.5">
+                <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                <span className="text-xs text-gray-500">
+                  {isConnected ? 'Live' : 'Offline'}
+                </span>
+              </div>
+
               {/* View Toggle */}
               <div className="flex items-center bg-white/5 rounded-lg p-1">
                 {[

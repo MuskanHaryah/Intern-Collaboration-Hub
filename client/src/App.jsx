@@ -8,6 +8,8 @@ import ProjectPage from './pages/ProjectPage';
 import { CursorGlow } from './components/UI/CursorGlow';
 import { ProtectedRoute, PublicRoute } from './components/Auth';
 import { useAuthStore } from './stores';
+import { SocketProvider } from './socket';
+import { RealtimeToast } from './components/UI';
 
 function App() {
   const initialize = useAuthStore((state) => state.initialize);
@@ -18,44 +20,47 @@ function App() {
   }, [initialize]);
 
   return (
-    <Router>
-      <CursorGlow />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <LoginPage />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <PublicRoute>
-              <RegisterPage />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/projects/:projectId"
-          element={
-            <ProtectedRoute>
-              <ProjectPage />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </Router>
+    <SocketProvider>
+      <Router>
+        <CursorGlow />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <RegisterPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/projects/:projectId"
+            element={
+              <ProtectedRoute>
+                <ProjectPage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Router>
+      <RealtimeToast />
+    </SocketProvider>
   );
 }
 

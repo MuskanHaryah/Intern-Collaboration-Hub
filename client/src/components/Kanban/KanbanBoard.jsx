@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { motion, AnimatePresence } from 'framer-motion';
 import TaskCard from './TaskCard';
 import AddTaskModal from './AddTaskModal';
+import { useSocket } from '../../socket';
 
 export default function KanbanBoard({ 
   columns: initialColumns, 
@@ -13,6 +14,7 @@ export default function KanbanBoard({
   onMoveTask,
   projectMembers = []
 }) {
+  const { editingUsers } = useSocket();
   const [columns, setColumns] = useState(
     initialColumns || [
       { id: 'backlog', name: 'Backlog', color: '#6b7280', order: 0 },
@@ -266,6 +268,7 @@ export default function KanbanBoard({
                                 onUpdate={(updates) => onUpdateTask?.(task.id, updates)}
                                 onDelete={() => onDeleteTask?.(task.id)}
                                 isDragging={snapshot.isDragging}
+                                editingUsers={editingUsers[task.id] || []}
                               />
                             </div>
                           )}
