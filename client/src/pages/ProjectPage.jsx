@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { KanbanBoard } from '../components/Kanban';
+import { MilestoneList, MilestoneProgress } from '../components/Milestones';
 import { useSocket } from '../socket';
 import { OnlineUsers } from '../components/UI';
 
@@ -8,8 +9,10 @@ export default function ProjectPage() {
   const { projectId } = useParams();
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
+  const [milestones, setMilestones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('board'); // board, list, timeline
+  const [showMilestones, setShowMilestones] = useState(true);
   const { joinProjectRoom, leaveProjectRoom, onlineUsers, isConnected } = useSocket();
 
   // Join project room on mount, leave on unmount
@@ -144,9 +147,37 @@ export default function ProjectPage() {
       },
     ];
 
+    const mockMilestones = [
+      {
+        id: '1',
+        title: 'Phase 1 Complete',
+        description: 'Complete all foundation work including design system and authentication',
+        dueDate: '2024-02-01',
+        completed: true,
+        project: projectId,
+      },
+      {
+        id: '2',
+        title: 'Beta Release',
+        description: 'Launch the beta version with core features for testing',
+        dueDate: '2024-03-15',
+        completed: false,
+        project: projectId,
+      },
+      {
+        id: '3',
+        title: 'Public Launch',
+        description: 'Official release with all planned features',
+        dueDate: '2024-04-30',
+        completed: false,
+        project: projectId,
+      },
+    ];
+
     setTimeout(() => {
       setProject(mockProject);
       setTasks(mockTasks);
+      setMilestones(mockMilestones);
       setLoading(false);
     }, 500);
   }, [projectId]);
@@ -173,6 +204,36 @@ export default function ProjectPage() {
     setTasks(
       tasks.map((t) =>
         t.id === taskId ? { ...t, column: newColumn, order: newOrder } : t
+      )
+    );
+  };
+
+  // Milestone handlers
+  const handleAddMilestone = (milestoneData) => {
+    const newMilestone = {
+      id: Date.now().toString(),
+      ...milestoneData,
+      completed: false,
+    };
+    setMilestones([...milestones, newMilestone]);
+  };
+
+  const handleUpdateMilestone = (milestoneId, updates) => {
+    setMilestones(
+      milestones.map((m) => 
+        (m.id === milestoneId || m._id === milestoneId) ? { ...m, ...updates } : m
+      )
+    );
+  };
+
+  const handleDeleteMilestone = (milestoneId) => {
+    setMilestones(milestones.filter((m) => m.id !== milestoneId && m._id !== milestoneId));
+  };
+
+  const handleToggleMilestone = (milestoneId, completed) => {
+    setMilestones(
+      milestones.map((m) => 
+        (m.id === milestoneId || m._id === milestoneId) ? { ...m, completed } : m
       )
     );
   };
@@ -356,21 +417,57 @@ export default function ProjectPage() {
                 {Math.round((taskStats.completed / taskStats.total) * 100)}%
               </span>
             </div>
+
+            {/* Milestones Toggle */}
+            <button
+              onClick={() => setShowMilestones(!showMilestones)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm transition-all ${
+                showMilestones
+                  ? 'bg-purple-500/20 border-purple-500/30 text-purple-400'
+                  : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              Milestones
+              <span className="px-1.5 py-0.5 bg-white/10 rounded text-xs">
+                {milestones.filter(m => m.completed).length}/{milestones.length}
+              </span>
+            </button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="h-[calc(100vh-160px)]">
-        <KanbanBoard
-          columns={project.taskColumns}
-          tasks={tasks}
-          onAddTask={handleAddTask}
-          onUpdateTask={handleUpdateTask}
-          onDeleteTask={handleDeleteTask}
-          onMoveTask={handleMoveTask}
-          projectMembers={project.members}
-        />
+      <main className="flex h-[calc(100vh-160px)]">
+        {/* Kanban Board */}
+        <div className={`flex-1 overflow-hidden transition-all ${showMilestones ? 'pr-0' : ''}`}>
+          <KanbanBoard
+            columns={project.taskColumns}
+            tasks={tasks}
+            onAddTask={handleAddTask}
+            onUpdateTask={handleUpdateTask}
+            onDeleteTask={handleDeleteTask}
+            onMoveTask={handleMoveTask}
+            projectMembers={project.members}
+          />
+        </div>
+
+        {/* Milestones Sidebar */}
+        {showMilestones && (
+          <div className="w-96 flex-shrink-0 p-4 border-l border-white/5 overflow-y-auto">
+            <MilestoneList
+              milestones={milestones}
+              tasks={tasks}
+              projectId={projectId}
+              onAddMilestone={handleAddMilestone}
+              onUpdateMilestone={handleUpdateMilestone}
+              onDeleteMilestone={handleDeleteMilestone}
+              onToggleMilestone={handleToggleMilestone}
+            />
+          </div>
+        )}
       </main>
     </div>
   );
