@@ -1,36 +1,31 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useAuthStore } from '../stores';
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login, isLoading, error, clearError } = useAuthStore();
+  
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+
+  // Get the redirect path from location state, default to dashboard
+  const from = location.state?.from?.pathname || '/dashboard';
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError('');
+    if (error) clearError();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError('');
-
-    try {
-      // TODO: Connect to backend API
-      console.log('Login attempt:', formData);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // For now, just log - will connect to backend later
-      alert('Login functionality will be connected to backend in Step 8');
-    } catch (err) {
-      setError('Invalid email or password');
-    } finally {
-      setIsLoading(false);
+    const result = await login(formData);
+    if (result.success) {
+      navigate(from, { replace: true });
     }
   };
 

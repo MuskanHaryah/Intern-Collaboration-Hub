@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -5,17 +6,54 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ProjectPage from './pages/ProjectPage';
 import { CursorGlow } from './components/UI/CursorGlow';
+import { ProtectedRoute, PublicRoute } from './components/Auth';
+import { useAuthStore } from './stores';
 
 function App() {
+  const initialize = useAuthStore((state) => state.initialize);
+
+  // Initialize auth state on app load
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
   return (
     <Router>
       <CursorGlow />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/projects/:projectId" element={<ProjectPage />} />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects/:projectId"
+          element={
+            <ProtectedRoute>
+              <ProjectPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

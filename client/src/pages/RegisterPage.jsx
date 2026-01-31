@@ -1,53 +1,52 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useAuthStore } from '../stores';
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
+  const { register, isLoading, error, clearError } = useAuthStore();
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [validationError, setValidationError] = useState('');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError('');
+    setValidationError('');
+    if (error) clearError();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError('');
 
     // Validation
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      setIsLoading(false);
+      setValidationError('Passwords do not match');
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      setIsLoading(false);
+      setValidationError('Password must be at least 6 characters');
       return;
     }
 
-    try {
-      // TODO: Connect to backend API
-      console.log('Register attempt:', formData);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // For now, just log - will connect to backend later
-      alert('Register functionality will be connected to backend in Step 8');
-    } catch (err) {
-      setError('Registration failed. Please try again.');
-    } finally {
-      setIsLoading(false);
+    const result = await register({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+    });
+    
+    if (result.success) {
+      navigate('/dashboard', { replace: true });
     }
   };
+
+  const displayError = validationError || error;
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-4 py-12 relative overflow-hidden">
@@ -78,12 +77,13 @@ export default function RegisterPage() {
           <p className="text-gray-400 mb-6">Join the collaboration revolution</p>
 
           {error && (
+          {displayError && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg mb-6"
             >
-              {error}
+              {displayError}
             </motion.div>
           )}
 
