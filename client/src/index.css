@@ -17,7 +17,6 @@ body {
   background-color: #0a0a0f;
   color: #ffffff;
   overflow-x: hidden;
-  cursor: none;
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
@@ -27,27 +26,7 @@ body {
   color: #1a1a2e;
 }
 
-/* Traditional arrow cursor */
-.cursor-arrow {
-  position: fixed;
-  pointer-events: none;
-  z-index: 10000;
-  transform: translate(-2px, -2px);
-  transition: transform 0.15s ease;
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
-}
-
-.cursor-arrow.hovering {
-  transform: translate(-2px, -2px) scale(1.2);
-  filter: drop-shadow(0 0 15px rgba(176, 38, 255, 0.8));
-}
-
-.cursor-arrow.hovering svg path {
-  fill: #b026ff;
-  stroke: #ffffff;
-}
-
-/* Large ambient glow - appears near robot */
+/* Large ambient glow - appears near right side */
 .cursor-ambient-glow {
   position: fixed;
   width: 300px;
@@ -66,10 +45,6 @@ body {
   opacity: 1;
 }
 
-/* Restore cursor for interactive elements */
-a, button, input, textarea, select, [role="button"] {
-  cursor: none;
-}
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
