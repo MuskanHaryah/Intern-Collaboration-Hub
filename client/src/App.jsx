@@ -7,16 +7,17 @@ import DashboardPage from './pages/DashboardPage';
 import ProjectPage from './pages/ProjectPage';
 import { CursorGlow } from './components/UI/CursorGlow';
 import { ProtectedRoute, PublicRoute } from './components/Auth';
-import { useAuthStore } from './stores';
+import { useAuthStore, useThemeStore } from './stores';
 import { SocketProvider } from './socket';
 import { RealtimeToast } from './components/UI';
 
 function App() {
   const initialize = useAuthStore((state) => state.initialize);
 
-  // Initialize auth state on app load
+  // Initialize auth state and theme on app load
   useEffect(() => {
     initialize();
+    useThemeStore.getState().initializeTheme();
   }, [initialize]);
 
   return (

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import ThemeToggle from '../components/UI/ThemeToggle';
+import useThemeStore from '../stores/themeStore';
 
 // Mock data for now - will be replaced with API calls
 const mockProjects = [
@@ -53,6 +55,8 @@ export default function DashboardPage() {
   const [projects, setProjects] = useState(mockProjects);
   const [stats, setStats] = useState(mockStats);
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+  const theme = useThemeStore((s) => s.theme);
+  const isDark = theme === 'dark';
 
   const getPriorityColor = (priority) => {
     const colors = {
@@ -75,22 +79,28 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f]">
+    <div className={`min-h-screen transition-colors duration-500 ${isDark ? 'bg-[#0a0a0f]' : 'bg-[#f0f2f5]'}`}>
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 bg-[#12121a] border-r border-white/10 p-4 z-40">
+      <aside className={`fixed left-0 top-0 h-full w-64 border-r p-4 z-40 transition-colors duration-500 ${
+        isDark ? 'bg-[#12121a] border-white/10' : 'bg-white border-gray-200'
+      }`}>
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 mb-8">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg">
             C
           </div>
-          <span className="text-xl font-bold text-white">CollabHub</span>
+          <span className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>CollabHub</span>
         </Link>
 
         {/* Navigation */}
         <nav className="space-y-2">
           <Link
             to="/dashboard"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl ${
+              isDark 
+                ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' 
+                : 'bg-purple-50 text-purple-600 border border-purple-200'
+            }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -100,7 +110,9 @@ export default function DashboardPage() {
 
           <Link
             to="/projects"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+              isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+            }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
@@ -110,7 +122,9 @@ export default function DashboardPage() {
 
           <Link
             to="/tasks"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+              isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+            }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
@@ -120,7 +134,9 @@ export default function DashboardPage() {
 
           <Link
             to="/team"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+              isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+            }`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -131,15 +147,17 @@ export default function DashboardPage() {
 
         {/* User Profile */}
         <div className="absolute bottom-4 left-4 right-4">
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+          <div className={`flex items-center gap-3 p-3 rounded-xl border transition-colors duration-500 ${
+            isDark ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'
+          }`}>
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold">
               U
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">User Name</p>
-              <p className="text-xs text-gray-500 truncate">user@example.com</p>
+              <p className={`text-sm font-medium truncate ${isDark ? 'text-white' : 'text-gray-900'}`}>User Name</p>
+              <p className={`text-xs truncate ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>user@example.com</p>
             </div>
-            <button className="p-2 text-gray-400 hover:text-white transition-colors">
+            <button className={`p-2 transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-400 hover:text-gray-700'}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -154,10 +172,12 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
-            <p className="text-gray-400">Welcome back! Here's what's happening with your projects.</p>
+            <h1 className={`text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Dashboard</h1>
+            <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>Welcome back! Here's what's happening with your projects.</p>
           </div>
-          <motion.button
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setShowNewProjectModal(true)}
@@ -168,6 +188,7 @@ export default function DashboardPage() {
             </svg>
             New Project
           </motion.button>
+          </div>
         </div>
 
         {/* Stats Grid */}
@@ -183,7 +204,11 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-[#12121a] border border-white/10 rounded-2xl p-6 hover:border-purple-500/50 transition-all"
+              className={`rounded-2xl p-6 transition-all duration-500 border ${
+                isDark 
+                  ? 'bg-[#12121a] border-white/10 hover:border-purple-500/50' 
+                  : 'bg-white border-gray-200 hover:border-purple-300 shadow-sm'
+              }`}
             >
               <div className="flex items-center justify-between mb-4">
                 <span className="text-3xl">{stat.icon}</span>
@@ -191,8 +216,8 @@ export default function DashboardPage() {
                   <div className={`w-3 h-3 rounded-full bg-${stat.color}-500`}></div>
                 </div>
               </div>
-              <p className="text-3xl font-bold text-white mb-1">{stat.value}</p>
-              <p className="text-gray-400 text-sm">{stat.label}</p>
+              <p className={`text-3xl font-bold mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{stat.value}</p>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{stat.label}</p>
             </motion.div>
           ))}
         </div>
@@ -200,7 +225,7 @@ export default function DashboardPage() {
         {/* Projects Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">Your Projects</h2>
+            <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Your Projects</h2>
             <Link to="/projects" className="text-purple-400 hover:text-purple-300 text-sm transition-colors">
               View all →
             </Link>
@@ -216,7 +241,11 @@ export default function DashboardPage() {
               >
                 <Link
                   to={`/projects/${project.id}`}
-                  className="block bg-[#12121a] border border-white/10 rounded-2xl p-6 hover:border-purple-500/50 transition-all group"
+                  className={`block rounded-2xl p-6 transition-all group border ${
+                    isDark 
+                      ? 'bg-[#12121a] border-white/10 hover:border-purple-500/50' 
+                      : 'bg-white border-gray-200 hover:border-purple-300 shadow-sm'
+                  }`}
                 >
                   {/* Project Header */}
                   <div className="flex items-start justify-between mb-4">
@@ -235,22 +264,22 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Project Info */}
-                  <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-purple-400 transition-colors">
+                  <h3 className={`text-lg font-semibold mb-2 group-hover:text-purple-400 transition-colors ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {project.name}
                   </h3>
-                  <p className="text-gray-400 text-sm mb-4 line-clamp-2">
+                  <p className={`text-sm mb-4 line-clamp-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                     {project.description}
                   </p>
 
                   {/* Progress Bar */}
                   <div className="mb-4">
                     <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-gray-400">Progress</span>
-                      <span className="text-white font-medium">
+                      <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Progress</span>
+                      <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                         {Math.round((project.completedTasks / project.taskCount) * 100)}%
                       </span>
                     </div>
-                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
                       <div
                         className="h-full rounded-full transition-all"
                         style={{
@@ -265,9 +294,9 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${getPriorityColor(project.priority)}`}></div>
-                      <span className="text-gray-400 text-sm capitalize">{project.priority}</span>
+                      <span className={`text-sm capitalize ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{project.priority}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-400 text-sm">
+                    <div className={`flex items-center gap-2 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
@@ -282,8 +311,10 @@ export default function DashboardPage() {
 
         {/* Recent Activity */}
         <div>
-          <h2 className="text-xl font-semibold text-white mb-6">Recent Activity</h2>
-          <div className="bg-[#12121a] border border-white/10 rounded-2xl p-6">
+          <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-white' : 'text-gray-900'}`}>Recent Activity</h2>
+          <div className={`rounded-2xl p-6 border transition-colors duration-500 ${
+            isDark ? 'bg-[#12121a] border-white/10' : 'bg-white border-gray-200 shadow-sm'
+          }`}>
             <div className="space-y-4">
               {[
                 { user: 'John Doe', action: 'completed task', target: 'Setup database', time: '2 minutes ago', color: 'green' },
@@ -291,17 +322,17 @@ export default function DashboardPage() {
                 { user: 'Mike Johnson', action: 'moved task to', target: 'In Progress', time: '1 hour ago', color: 'yellow' },
                 { user: 'Sarah Wilson', action: 'created task', target: 'User authentication', time: '2 hours ago', color: 'purple' },
               ].map((activity, index) => (
-                <div key={index} className="flex items-center gap-4 py-3 border-b border-white/5 last:border-0">
+                <div key={index} className={`flex items-center gap-4 py-3 border-b last:border-0 ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
                   <div className={`w-10 h-10 rounded-full bg-${activity.color}-500/20 flex items-center justify-center text-${activity.color}-400 font-semibold`}>
                     {activity.user.charAt(0)}
                   </div>
                   <div className="flex-1">
-                    <p className="text-white">
+                    <p className={isDark ? 'text-white' : 'text-gray-900'}>
                       <span className="font-medium">{activity.user}</span>{' '}
-                      <span className="text-gray-400">{activity.action}</span>{' '}
+                      <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>{activity.action}</span>{' '}
                       <span className="text-purple-400">{activity.target}</span>
                     </p>
-                    <p className="text-gray-500 text-sm">{activity.time}</p>
+                    <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{activity.time}</p>
                   </div>
                 </div>
               ))}
@@ -320,6 +351,8 @@ export default function DashboardPage() {
 
 // New Project Modal Component
 function NewProjectModal({ onClose }) {
+  const theme = useThemeStore((s) => s.theme);
+  const isDark = theme === 'dark';
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -341,10 +374,12 @@ function NewProjectModal({ onClose }) {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-[#12121a] border border-white/10 rounded-2xl p-6 w-full max-w-md"
+        className={`rounded-2xl p-6 w-full max-w-md border transition-colors duration-500 ${
+          isDark ? 'bg-[#12121a] border-white/10' : 'bg-white border-gray-200 shadow-xl'
+        }`}
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-white">Create New Project</h2>
+          <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Create New Project</h2>
           <button
             onClick={onClose}
             className="p-2 text-gray-400 hover:text-white transition-colors"
@@ -357,7 +392,7 @@ function NewProjectModal({ onClose }) {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
               Project Name
             </label>
             <input
@@ -365,26 +400,34 @@ function NewProjectModal({ onClose }) {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              className="w-full px-4 py-3 bg-[#1a1a2e] border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-all"
+              className={`w-full px-4 py-3 border rounded-xl transition-all focus:outline-none focus:border-purple-500 ${
+                isDark 
+                  ? 'bg-[#1a1a2e] border-white/10 text-white placeholder-gray-500' 
+                  : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
+              }`}
               placeholder="Enter project name"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-4 py-3 bg-[#1a1a2e] border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-all resize-none"
+              className={`w-full px-4 py-3 border rounded-xl transition-all resize-none focus:outline-none focus:border-purple-500 ${
+                isDark 
+                  ? 'bg-[#1a1a2e] border-white/10 text-white placeholder-gray-500' 
+                  : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
+              }`}
               placeholder="Describe your project"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
               Color
             </label>
             <div className="flex gap-3">
@@ -403,13 +446,17 @@ function NewProjectModal({ onClose }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
               Priority
             </label>
             <select
               value={formData.priority}
               onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-              className="w-full px-4 py-3 bg-[#1a1a2e] border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500 transition-all"
+              className={`w-full px-4 py-3 border rounded-xl transition-all focus:outline-none focus:border-purple-500 ${
+                isDark 
+                  ? 'bg-[#1a1a2e] border-white/10 text-white' 
+                  : 'bg-gray-50 border-gray-200 text-gray-900'
+              }`}
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -422,7 +469,11 @@ function NewProjectModal({ onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-all"
+              className={`flex-1 px-4 py-3 border rounded-xl transition-all ${
+                isDark 
+                  ? 'bg-white/5 border-white/10 text-white hover:bg-white/10' 
+                  : 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200'
+              }`}
             >
               Cancel
             </button>

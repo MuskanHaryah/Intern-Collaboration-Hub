@@ -1,25 +1,44 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import ThemeToggle from '../components/UI/ThemeToggle';
+import useThemeStore from '../stores/themeStore';
 
 export default function HomePage() {
+  const theme = useThemeStore((s) => s.theme);
+  const isDark = theme === 'dark';
+
   return (
-    <div className="relative min-h-screen bg-[#0a0a0f] overflow-hidden">
+    <div className={`relative min-h-screen overflow-hidden transition-colors duration-500 ${
+      isDark ? 'bg-[#0a0a0f]' : 'bg-[#f8f9fc]'
+    }`}>
       {/* Background gradient effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-pink-900/20" />
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl" />
-      <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl" />
+      <div className={`absolute inset-0 transition-opacity duration-500 ${
+        isDark 
+          ? 'bg-gradient-to-br from-purple-900/20 via-transparent to-pink-900/20' 
+          : 'bg-gradient-to-br from-purple-100/60 via-transparent to-pink-100/60'
+      }`} />
+      <div className={`absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl transition-colors duration-500 ${
+        isDark ? 'bg-purple-500/10' : 'bg-purple-300/20'
+      }`} />
+      <div className={`absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl transition-colors duration-500 ${
+        isDark ? 'bg-pink-500/10' : 'bg-pink-300/20'
+      }`} />
+      <div className={`absolute top-1/2 right-1/3 w-64 h-64 rounded-full blur-3xl transition-colors duration-500 ${
+        isDark ? 'bg-cyan-500/5' : 'bg-cyan-300/15'
+      }`} />
 
       {/* Animated grid background */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `
-            linear-gradient(rgba(176, 38, 255, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(176, 38, 255, 0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px',
-        }} />
-      </div>
+      {isDark && (
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `
+              linear-gradient(rgba(176, 38, 255, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(176, 38, 255, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px',
+          }} />
+        </div>
+      )}
 
       {/* Navigation */}
       <nav className="relative z-20 flex items-center justify-between px-8 py-6">
@@ -27,18 +46,23 @@ export default function HomePage() {
           <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/25">
             <span className="text-white font-bold text-xl">C</span>
           </div>
-          <span className="text-white font-semibold text-xl">CollabHub</span>
+          <span className={`font-semibold text-xl transition-colors ${isDark ? 'text-white' : 'text-gray-900'}`}>CollabHub</span>
         </div>
 
         <div className="hidden md:flex items-center gap-8">
-          <a href="#" className="text-white font-medium border-b-2 border-purple-500 pb-1">Home</a>
-          <a href="#features" className="text-gray-400 hover:text-white transition-colors">Features</a>
-          <a href="#about" className="text-gray-400 hover:text-white transition-colors">About</a>
-          <a href="#contact" className="text-gray-400 hover:text-white transition-colors">Contact</a>
+          <a href="#" className={`font-medium border-b-2 border-purple-500 pb-1 transition-colors ${isDark ? 'text-white' : 'text-gray-900'}`}>Home</a>
+          <a href="#features" className={`transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`}>Features</a>
+          <a href="#about" className={`transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`}>About</a>
+          <a href="#contact" className={`transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`}>Contact</a>
         </div>
 
         <div className="flex items-center gap-4">
-          <Link to="/login" className="px-5 py-2 text-white border border-white/20 rounded-full hover:bg-white/10 transition-all hidden sm:block">
+          <ThemeToggle />
+          <Link to="/login" className={`px-5 py-2 rounded-full transition-all hidden sm:block ${
+            isDark 
+              ? 'text-white border border-white/20 hover:bg-white/10' 
+              : 'text-gray-700 border border-gray-300 hover:bg-gray-100'
+          }`}>
             Login
           </Link>
           <Link to="/register" className="px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all">
@@ -66,7 +90,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold text-white mb-6"
+            className={`text-5xl md:text-7xl font-bold mb-6 ${isDark ? 'text-white' : 'text-gray-900'}`}
           >
             <span className="block">COLLABORATE</span>
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">
@@ -79,7 +103,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-gray-400 text-lg mb-8 max-w-lg leading-relaxed"
+            className={`text-lg mb-8 max-w-lg leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
           >
             Enable interns to collaborate on real-time projects efficiently. 
             Our Kanban-style board keeps everyone in sync with live updates 
@@ -101,26 +125,25 @@ export default function HomePage() {
               <span className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 blur-xl opacity-50 group-hover:opacity-80 group-hover:blur-2xl transition-all duration-500 -z-10 scale-110" />
               <span className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600/60 to-pink-600/60 blur-2xl opacity-30 group-hover:opacity-60 transition-all duration-500 -z-20 scale-150" />
               Start Collaborating
-              <motion.svg 
-                className="w-5 h-5"
+              <svg 
+                className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
-                initial={false}
-                whileHover={{ x: 0 }}
               >
-                <motion.path 
+                <path 
                   strokeLinecap="round" 
                   strokeLinejoin="round" 
                   strokeWidth={2} 
                   d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  className="group-hover:translate-x-1 transition-transform duration-300"
                 />
-              </motion.svg>
+              </svg>
             </Link>
-            <button className="group relative px-6 py-3 border border-white/20 text-white rounded-full font-medium hover:bg-white/10 transition-all flex items-center gap-2">
-              {/* Subtle glow on hover */}
-              <span className="absolute inset-0 rounded-full bg-white/5 blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10 scale-110" />
+            <button className={`group relative px-6 py-3 rounded-full font-medium transition-all flex items-center gap-2 ${
+              isDark 
+                ? 'border border-white/20 text-white hover:bg-white/10' 
+                : 'border border-gray-300 text-gray-700 hover:bg-gray-100'
+            }`}>
               <svg className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -137,16 +160,16 @@ export default function HomePage() {
             className="flex gap-8 mt-12"
           >
             <div>
-              <p className="text-3xl font-bold text-white">500+</p>
-              <p className="text-gray-500 text-sm">Active Interns</p>
+              <p className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>500+</p>
+              <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Active Interns</p>
             </div>
             <div>
-              <p className="text-3xl font-bold text-white">1.2K</p>
-              <p className="text-gray-500 text-sm">Projects Created</p>
+              <p className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>1.2K</p>
+              <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Projects Created</p>
             </div>
             <div>
-              <p className="text-3xl font-bold text-white">99%</p>
-              <p className="text-gray-500 text-sm">Satisfaction</p>
+              <p className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>99%</p>
+              <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Satisfaction</p>
             </div>
           </motion.div>
         </div>
@@ -160,7 +183,11 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 bg-[#12121a]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl"
+              className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 backdrop-blur-xl rounded-2xl p-6 shadow-2xl transition-colors duration-500 ${
+                isDark 
+                  ? 'bg-[#12121a]/80 border border-white/10' 
+                  : 'bg-white/80 border border-gray-200 shadow-xl shadow-purple-500/5'
+              }`}
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-3 h-3 rounded-full bg-red-500" />
@@ -169,33 +196,33 @@ export default function HomePage() {
               </div>
               <div className="space-y-3">
                 <div className="flex gap-3">
-                  <div className="flex-1 bg-purple-500/20 border border-purple-500/30 rounded-lg p-3">
+                  <div className={`flex-1 rounded-lg p-3 ${isDark ? 'bg-purple-500/20 border border-purple-500/30' : 'bg-purple-50 border border-purple-200'}`}>
                     <div className="h-2 w-16 bg-purple-500/50 rounded mb-2" />
-                    <div className="h-2 w-full bg-white/10 rounded" />
+                    <div className={`h-2 w-full rounded ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
                   </div>
-                  <div className="flex-1 bg-cyan-500/20 border border-cyan-500/30 rounded-lg p-3">
+                  <div className={`flex-1 rounded-lg p-3 ${isDark ? 'bg-cyan-500/20 border border-cyan-500/30' : 'bg-cyan-50 border border-cyan-200'}`}>
                     <div className="h-2 w-12 bg-cyan-500/50 rounded mb-2" />
-                    <div className="h-2 w-full bg-white/10 rounded" />
+                    <div className={`h-2 w-full rounded ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <div className="flex-1 bg-pink-500/20 border border-pink-500/30 rounded-lg p-3">
+                  <div className={`flex-1 rounded-lg p-3 ${isDark ? 'bg-pink-500/20 border border-pink-500/30' : 'bg-pink-50 border border-pink-200'}`}>
                     <div className="h-2 w-14 bg-pink-500/50 rounded mb-2" />
-                    <div className="h-2 w-3/4 bg-white/10 rounded" />
+                    <div className={`h-2 w-3/4 rounded ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
                   </div>
-                  <div className="flex-1 bg-green-500/20 border border-green-500/30 rounded-lg p-3">
+                  <div className={`flex-1 rounded-lg p-3 ${isDark ? 'bg-green-500/20 border border-green-500/30' : 'bg-green-50 border border-green-200'}`}>
                     <div className="h-2 w-10 bg-green-500/50 rounded mb-2" />
-                    <div className="h-2 w-full bg-white/10 rounded" />
+                    <div className={`h-2 w-full rounded ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
                   </div>
                 </div>
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex -space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 border-2 border-[#12121a]" />
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 border-2 border-[#12121a]" />
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 border-2 border-[#12121a]" />
+                  <div className={`w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 border-2 ${isDark ? 'border-[#12121a]' : 'border-white'}`} />
+                  <div className={`w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 border-2 ${isDark ? 'border-[#12121a]' : 'border-white'}`} />
+                  <div className={`w-8 h-8 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 border-2 ${isDark ? 'border-[#12121a]' : 'border-white'}`} />
                 </div>
-                <span className="text-xs text-gray-500">Live • 3 online</span>
+                <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Live • 3 online</span>
               </div>
             </motion.div>
 
@@ -204,14 +231,18 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="absolute top-16 right-8 w-48 bg-[#1a1a2e] border border-purple-500/30 rounded-xl p-4 shadow-lg shadow-purple-500/10 animate-float"
+              className={`absolute top-16 right-8 w-48 rounded-xl p-4 shadow-lg animate-float transition-colors duration-500 ${
+                isDark 
+                  ? 'bg-[#1a1a2e] border border-purple-500/30 shadow-purple-500/10' 
+                  : 'bg-white border border-purple-200 shadow-purple-100'
+              }`}
             >
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-2 h-2 rounded-full bg-purple-500" />
                 <span className="text-xs text-purple-400">In Progress</span>
               </div>
-              <p className="text-white text-sm font-medium">Design System</p>
-              <p className="text-gray-500 text-xs mt-1">3 subtasks</p>
+              <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>Design System</p>
+              <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>3 subtasks</p>
             </motion.div>
 
             {/* Floating Task Card 2 */}
@@ -219,14 +250,18 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="absolute bottom-20 left-8 w-52 bg-[#1a1a2e] border border-green-500/30 rounded-xl p-4 shadow-lg shadow-green-500/10 animate-float-delayed"
+              className={`absolute bottom-20 left-8 w-52 rounded-xl p-4 shadow-lg animate-float-delayed transition-colors duration-500 ${
+                isDark 
+                  ? 'bg-[#1a1a2e] border border-green-500/30 shadow-green-500/10' 
+                  : 'bg-white border border-green-200 shadow-green-100'
+              }`}
             >
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-2 h-2 rounded-full bg-green-500" />
                 <span className="text-xs text-green-400">Completed</span>
               </div>
-              <p className="text-white text-sm font-medium">API Integration</p>
-              <div className="mt-2 h-1.5 bg-white/10 rounded-full">
+              <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>API Integration</p>
+              <div className={`mt-2 h-1.5 rounded-full ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
                 <div className="h-full w-full bg-green-500 rounded-full" />
               </div>
             </motion.div>
@@ -241,20 +276,22 @@ export default function HomePage() {
               +5 Updates
             </motion.div>
 
-            {/* Floating Orb 1 */}
+            {/* Floating Orbs */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 0.7 }}
-              className="absolute top-8 left-1/3 w-20 h-20 rounded-full bg-gradient-to-r from-purple-500/30 to-pink-500/30 blur-xl animate-float"
+              className={`absolute top-8 left-1/3 w-20 h-20 rounded-full blur-xl animate-float ${
+                isDark ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30' : 'bg-gradient-to-r from-purple-300/30 to-pink-300/30'
+              }`}
             />
-
-            {/* Floating Orb 2 */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 0.9 }}
-              className="absolute bottom-8 right-1/4 w-16 h-16 rounded-full bg-gradient-to-r from-cyan-500/30 to-blue-500/30 blur-xl animate-float-delayed"
+              className={`absolute bottom-8 right-1/4 w-16 h-16 rounded-full blur-xl animate-float-delayed ${
+                isDark ? 'bg-gradient-to-r from-cyan-500/30 to-blue-500/30' : 'bg-gradient-to-r from-cyan-300/30 to-blue-300/30'
+              }`}
             />
 
             {/* Connection Lines */}
@@ -287,32 +324,6 @@ export default function HomePage() {
               />
             </svg>
           </div>
-        </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20"
-      >
-        <div className="w-8 h-12 border-2 border-purple-500/50 rounded-full flex items-start justify-center p-2">
-          <motion.div 
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-1.5 h-3 bg-purple-500 rounded-full" 
-          />
-        </div>
-      </motion.div>
-
-      {/* Side decoration */}
-      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 hidden lg:block">
-        <div className="flex flex-col gap-3 pr-8">
-          <div className="w-2 h-2 rounded-full bg-purple-500" />
-          <div className="w-2 h-2 rounded-full bg-white/30" />
-          <div className="w-2 h-2 rounded-full bg-white/30" />
-          <div className="w-2 h-2 rounded-full bg-white/30" />
         </div>
       </div>
     </div>

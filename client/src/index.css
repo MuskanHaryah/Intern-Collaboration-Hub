@@ -18,6 +18,13 @@ body {
   color: #ffffff;
   overflow-x: hidden;
   cursor: none;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Light mode body */
+:root:not(.dark) body {
+  background-color: #f8f9fc;
+  color: #1a1a2e;
 }
 
 /* Small cursor dot */
@@ -81,6 +88,15 @@ a, button, input, textarea, select, [role="button"] {
 
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #c040ff 0%, #ff4da5 100%);
+}
+
+/* Light mode scrollbar */
+:root:not(.dark) ::-webkit-scrollbar-track {
+  background: #f0f0f5;
+}
+
+:root:not(.dark) ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #9b59b6 0%, #e91e8c 100%);
 }
 
 /* Neon text effect */
@@ -274,16 +290,6 @@ a, button, input, textarea, select, [role="button"] {
   animation: gradient-border 4s ease infinite;
 }
 
-/* 3D Scene container */
-.robot-scene-container {
-  position: fixed;
-  right: 0;
-  top: 0;
-  width: 50%;
-  height: 100vh;
-  z-index: 1;
-  pointer-events: none;
-}
 
 /* Nav link hover effect */
 .nav-link {
