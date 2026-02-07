@@ -95,15 +95,33 @@ export default function HomePage() {
           >
             <Link 
               to="/register"
-              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all flex items-center gap-2"
+              className="group relative px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full font-medium transition-all flex items-center gap-2 overflow-visible"
             >
+              {/* Glow effect behind button */}
+              <span className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 blur-xl opacity-50 group-hover:opacity-80 group-hover:blur-2xl transition-all duration-500 -z-10 scale-110" />
+              <span className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600/60 to-pink-600/60 blur-2xl opacity-30 group-hover:opacity-60 transition-all duration-500 -z-20 scale-150" />
               Start Collaborating
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+              <motion.svg 
+                className="w-5 h-5"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+                initial={false}
+                whileHover={{ x: 0 }}
+              >
+                <motion.path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  className="group-hover:translate-x-1 transition-transform duration-300"
+                />
+              </motion.svg>
             </Link>
-            <button className="px-6 py-3 border border-white/20 text-white rounded-full font-medium hover:bg-white/10 transition-all flex items-center gap-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button className="group relative px-6 py-3 border border-white/20 text-white rounded-full font-medium hover:bg-white/10 transition-all flex items-center gap-2">
+              {/* Subtle glow on hover */}
+              <span className="absolute inset-0 rounded-full bg-white/5 blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10 scale-110" />
+              <svg className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
