@@ -257,7 +257,9 @@ export default function HomePage() {
               }`}
             >
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <svg className="w-3 h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
                 <span className="text-xs text-green-400">Completed</span>
               </div>
               <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>API Integration</p>
@@ -294,33 +296,39 @@ export default function HomePage() {
               }`}
             />
 
-            {/* Connection Lines */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30">
+            {/* Connection Lines with Arrows */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-40">
               <defs>
                 <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#b026ff" stopOpacity="0.5" />
-                  <stop offset="100%" stopColor="#ff2d95" stopOpacity="0.5" />
+                  <stop offset="0%" stopColor="#ec4899" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#f472b6" stopOpacity="0.6" />
                 </linearGradient>
+                <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                  <polygon points="0 0, 10 3, 0 6" fill="#ec4899" />
+                </marker>
               </defs>
+              {/* Curved arrow from +5 Updates badge to API Integration card */}
               <motion.path
-                d="M 100 150 Q 200 100 300 200"
+                d="M 150 150 Q 100 250 90 350"
                 stroke="url(#lineGradient)"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 fill="none"
-                strokeDasharray="5,5"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 2, delay: 1 }}
+                markerEnd="url(#arrowhead)"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 1.5, delay: 0.9 }}
               />
+              {/* Secondary decorative curved line */}
               <motion.path
-                d="M 250 400 Q 350 350 400 450"
+                d="M 180 160 Q 280 200 350 280"
                 stroke="url(#lineGradient)"
                 strokeWidth="2"
                 fill="none"
-                strokeDasharray="5,5"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 2, delay: 1.2 }}
+                strokeDasharray="4,4"
+                markerEnd="url(#arrowhead)"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 1.5, delay: 1.1 }}
               />
             </svg>
           </div>
