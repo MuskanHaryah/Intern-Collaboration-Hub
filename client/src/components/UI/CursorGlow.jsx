@@ -52,11 +52,21 @@ export function CursorGlow() {
 
   return (
     <>
-      {/* Main cursor dot */}
+      {/* Traditional arrow cursor */}
       <div
         ref={cursorRef}
-        className={`cursor-dot ${isHovering ? 'hovering' : ''}`}
-      />
+        className={`cursor-arrow ${isHovering ? 'hovering' : ''}`}
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path 
+            d="M5.5 3.21V20.79L10.92 15.37L14.5 21.77L16.5 20.77L12.92 14.37L20.08 13.21L5.5 3.21Z" 
+            fill="white"
+            stroke="black"
+            strokeWidth="1.5"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
       {/* Large ambient glow - only visible near robot */}
       <div
         ref={glowRef}

@@ -28,25 +28,23 @@ body {
 }
 
 /* Traditional arrow cursor */
-.cursor-dot {
+.cursor-arrow {
   position: fixed;
-  width: 0;
-  height: 0;
-  border-left: 10px solid #ffffff;
-  border-right: 6px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-top: 6px solid transparent;
   pointer-events: none;
   z-index: 10000;
-  transform: translate(-20%, -20%) rotate(-45deg);
-  transition: transform 0.15s ease, border-color 0.15s ease;
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+  transform: translate(-2px, -2px);
+  transition: transform 0.15s ease;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
 }
 
-.cursor-dot.hovering {
-  transform: translate(-20%, -20%) rotate(-45deg) scale(1.3);
-  border-left-color: #b026ff;
-  filter: drop-shadow(0 0 15px rgba(176, 38, 255, 0.9));
+.cursor-arrow.hovering {
+  transform: translate(-2px, -2px) scale(1.2);
+  filter: drop-shadow(0 0 15px rgba(176, 38, 255, 0.8));
+}
+
+.cursor-arrow.hovering svg path {
+  fill: #b026ff;
+  stroke: #ffffff;
 }
 
 /* Large ambient glow - appears near robot */
