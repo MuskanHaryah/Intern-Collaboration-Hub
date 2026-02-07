@@ -273,7 +273,7 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, delay: 0.8 }}
-              className="absolute top-32 left-16 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-pink-500/30 animate-pulse"
+              className="absolute top-32 left-32 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-pink-500/30 animate-pulse"
             >
               +5 Updates
             </motion.div>
@@ -309,7 +309,7 @@ export default function HomePage() {
               </defs>
               {/* Curved arrow from +5 Updates badge to API Integration card */}
               <motion.path
-                d="M 150 150 Q 100 250 90 350"
+                d="M 214 150 Q 150 250 90 350"
                 stroke="url(#lineGradient)"
                 strokeWidth="2.5"
                 fill="none"
@@ -320,7 +320,7 @@ export default function HomePage() {
               />
               {/* Secondary decorative curved line */}
               <motion.path
-                d="M 180 160 Q 280 200 350 280"
+                d="M 244 160 Q 320 200 380 280"
                 stroke="url(#lineGradient)"
                 strokeWidth="2"
                 fill="none"
