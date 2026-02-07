@@ -76,7 +76,6 @@ export default function RegisterPage() {
           <h2 className="text-2xl font-bold text-white mb-2">Create an account</h2>
           <p className="text-gray-400 mb-6">Join the collaboration revolution</p>
 
-          {error && (
           {displayError && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}

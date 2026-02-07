@@ -10,20 +10,18 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^16.5.0",
+    "axios": "^1.6.2",
+    "clsx": "^2.1.0",
+    "framer-motion": "^10.18.0",
+    "lucide-react": "^0.303.0",
     "react": "^18.2.0",
+    "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.0",
-    "@react-three/fiber": "^8.15.12",
-    "@react-three/drei": "^9.92.7",
-    "three": "^0.160.0",
     "socket.io-client": "^4.7.2",
-    "@hello-pangea/dnd": "^16.5.0",
-    "framer-motion": "^10.18.0",
-    "axios": "^1.6.2",
-    "zustand": "^4.4.7",
-    "lucide-react": "^0.303.0",
-    "clsx": "^2.1.0",
-    "tailwind-merge": "^2.2.0"
+    "tailwind-merge": "^2.2.0",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
     "@types/react": "^18.2.45",

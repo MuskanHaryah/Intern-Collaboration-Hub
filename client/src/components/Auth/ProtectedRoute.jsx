@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../stores';
+import { useAuthStore } from '../../stores';
 
 /**
  * Protected Route component - redirects to login if not authenticated

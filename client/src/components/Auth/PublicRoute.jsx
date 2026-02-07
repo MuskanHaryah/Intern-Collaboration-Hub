@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useAuthStore } from '../stores';
+import { useAuthStore } from '../../stores';
 
 /**
  * Public Route component - redirects to dashboard if already authenticated
