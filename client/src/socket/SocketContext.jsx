@@ -15,10 +15,12 @@ const SocketContext = createContext(null);
  * Socket Provider component - manages socket connection and event listeners
  */
 export function SocketProvider({ children }) {
+  console.log('🔌 [SocketProvider] SocketProvider rendering...');
   const [isConnected, setIsConnected] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [editingUsers, setEditingUsers] = useState({}); // { taskId: [users] }
   const { isAuthenticated, user } = useAuthStore();
+  console.log('🔌 [SocketProvider] isAuthenticated:', isAuthenticated, 'user:', user?.email);
   const { 
     addTaskFromSocket, 
     updateTaskFromSocket, 
@@ -31,7 +33,9 @@ export function SocketProvider({ children }) {
 
   // Initialize socket when authenticated
   useEffect(() => {
+    console.log('🔌 [SocketProvider] useEffect - isAuthenticated:', isAuthenticated);
     if (isAuthenticated) {
+      console.log('🔌 [SocketProvider] Initializing socket connection...');
       const socket = initializeSocket();
       
       if (socket) {
@@ -46,9 +50,9 @@ export function SocketProvider({ children }) {
           console.log('📥 Task added:', task.title);
           addTaskFromSocket(task);
           addToast({
-            type: 'info',
             message: `New task "${task.title}" created`,
-            user: task.createdBy?.name || 'Someone',
+            type: 'task',
+            avatar: task.createdBy?.avatar,
           });
         });
 
@@ -57,8 +61,8 @@ export function SocketProvider({ children }) {
           console.log('📥 Task updated:', task.title);
           updateTaskFromSocket(task);
           addToast({
-            type: 'info',
             message: `Task "${task.title}" was updated`,
+            type: 'info',
           });
         });
 
@@ -81,8 +85,8 @@ export function SocketProvider({ children }) {
           console.log('📥 Project updated:', project.name);
           updateProjectFromSocket(project);
           addToast({
-            type: 'info',
             message: `Project "${project.name}" was updated`,
+            type: 'info',
           });
         });
 
@@ -90,9 +94,9 @@ export function SocketProvider({ children }) {
         socket.on('member-joined', ({ projectId, member }) => {
           console.log('📥 Member joined:', member.name);
           addToast({
-            type: 'success',
             message: `${member.name} joined the project`,
-            user: member.name,
+            type: 'success',
+            avatar: member.avatar,
           });
         });
 
@@ -100,8 +104,8 @@ export function SocketProvider({ children }) {
         socket.on('member-left', ({ projectId, userId }) => {
           console.log('📥 Member left:', userId);
           addToast({
-            type: 'info',
             message: 'A team member left the project',
+            type: 'info',
           });
         });
 

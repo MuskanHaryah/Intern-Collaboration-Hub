@@ -9,7 +9,7 @@ export default function TaskDetailsModal({ isOpen, onClose, task, onUpdate, proj
   const [activeTab, setActiveTab] = useState('details'); // 'details', 'attachments', 'activity'
   const [localTask, setLocalTask] = useState(task);
   const [isUploading, setIsUploading] = useState(false);
-  const { addToast } = useToastStore();
+  const { success, error: showError } = useToastStore();
 
   useEffect(() => {
     setLocalTask(task);
@@ -18,7 +18,7 @@ export default function TaskDetailsModal({ isOpen, onClose, task, onUpdate, proj
   if (!task) return null;
 
   const handleUploadSuccess = (attachment) => {
-    addToast('File uploaded successfully', 'success');
+    success('File uploaded successfully', { type: 'upload' });
     // Update local task with new attachment
     const updatedTask = {
       ...localTask,
@@ -28,14 +28,14 @@ export default function TaskDetailsModal({ isOpen, onClose, task, onUpdate, proj
     onUpdate?.(updatedTask);
   };
 
-  const handleUploadError = (error) => {
-    addToast(error || 'Failed to upload file', 'error');
+  const handleUploadError = (errorMsg) => {
+    showError(errorMsg || 'Failed to upload file');
   };
 
   const handleDeleteAttachment = async (attachmentId) => {
     try {
       await taskService.deleteAttachment(task._id, attachmentId);
-      addToast('Attachment deleted successfully', 'success');
+      success('Attachment deleted successfully');
       
       // Update local task by removing the deleted attachment
       const updatedTask = {
@@ -44,8 +44,8 @@ export default function TaskDetailsModal({ isOpen, onClose, task, onUpdate, proj
       };
       setLocalTask(updatedTask);
       onUpdate?.(updatedTask);
-    } catch (error) {
-      addToast(error.message || 'Failed to delete attachment', 'error');
+    } catch (err) {
+      showError(err.message || 'Failed to delete attachment');
     }
   };
 

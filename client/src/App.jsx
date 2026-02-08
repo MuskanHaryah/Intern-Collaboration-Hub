@@ -7,10 +7,10 @@ import DashboardPage from './pages/DashboardPage';
 import ProjectPage from './pages/ProjectPage';
 import { CursorGlow } from './components/UI/CursorGlow';
 import { ErrorBoundary, AsyncHandlers } from './components/UI';
+import { ToastContainer } from './components/UI/RealtimeToast';
 import { ProtectedRoute, PublicRoute } from './components/Auth';
 import { useAuthStore, useThemeStore } from './stores';
 import { SocketProvider } from './socket';
-import { RealtimeToast } from './components/UI';
 
 console.log('📦 [App.jsx] App component loaded');
 
@@ -79,7 +79,7 @@ function App() {
             />
           </Routes>
         </Router>
-        <RealtimeToast />
+        <ToastContainer />
       </SocketProvider>
     </ErrorBoundary>
   );
