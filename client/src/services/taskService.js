@@ -162,6 +162,45 @@ const taskService = {
     const response = await api.delete(`/tasks/${taskId}/labels/${labelId}`);
     return response.data;
   },
+
+  /**
+   * Upload file attachment to a task
+   * @param {string} taskId
+   * @param {FormData} formData - FormData containing the file
+   * @returns {Promise} - { success, data: attachment }
+   */
+  uploadAttachment: async (taskId, formData) => {
+    const response = await api.post(`/tasks/${taskId}/attachments`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  /**
+   * Delete file attachment from a task
+   * @param {string} taskId
+   * @param {string} attachmentId
+   * @returns {Promise} - { success, message }
+   */
+  deleteAttachment: async (taskId, attachmentId) => {
+    const response = await api.delete(`/tasks/${taskId}/attachments/${attachmentId}`);
+    return response.data;
+  },
+
+  /**
+   * Download file attachment
+   * @param {string} taskId
+   * @param {string} attachmentId
+   * @returns {Promise<Blob>} - File blob
+   */
+  downloadAttachment: async (taskId, attachmentId) => {
+    const response = await api.get(`/tasks/${taskId}/attachments/${attachmentId}/download`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  },
 };
 
 export default taskService;

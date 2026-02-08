@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { motion, AnimatePresence } from 'framer-motion';
 import TaskCard from './TaskCard';
 import AddTaskModal from './AddTaskModal';
+import TaskDetailsModal from './TaskDetailsModal';
 import { useSocket } from '../../socket';
 
 export default function KanbanBoard({ 
@@ -26,6 +27,7 @@ export default function KanbanBoard({
   );
   
   const [showAddTask, setShowAddTask] = useState(null);
+  const [selectedTask, setSelectedTask] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPriority, setFilterPriority] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
@@ -86,6 +88,15 @@ export default function KanbanBoard({
   const handleAddTask = (taskData) => {
     onAddTask?.(taskData);
     setShowAddTask(null);
+  };
+
+  const handleTaskView = (task) => {
+    setSelectedTask(task);
+  };
+
+  const handleTaskUpdate = (updatedTask) => {
+    onUpdateTask?.(updatedTask._id || updatedTask.id, updatedTask);
+    setSelectedTask(updatedTask);
   };
 
   const totalTasks = tasks?.length || 0;
@@ -267,6 +278,7 @@ export default function KanbanBoard({
                                 task={task}
                                 onUpdate={(updates) => onUpdateTask?.(task.id, updates)}
                                 onDelete={() => onDeleteTask?.(task.id)}
+                                onView={handleTaskView}
                                 isDragging={snapshot.isDragging}
                                 editingUsers={editingUsers[task.id] || []}
                               />
@@ -332,6 +344,15 @@ export default function KanbanBoard({
             </button>
           </div>
         </div>
+
+      {/* Task Details Modal */}
+      <TaskDetailsModal
+        isOpen={!!selectedTask}
+        onClose={() => setSelectedTask(null)}
+        task={selectedTask}
+        onUpdate={handleTaskUpdate}
+        projectMembers={projectMembers}
+      />
       </DragDropContext>
 
       {/* Add Task Modal */}
