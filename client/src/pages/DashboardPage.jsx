@@ -3,60 +3,106 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ThemeToggle from '../components/UI/ThemeToggle';
 import useThemeStore from '../stores/themeStore';
-
-// Mock data for now - will be replaced with API calls
-const mockProjects = [
-  {
-    id: '1',
-    name: 'Website Redesign',
-    description: 'Complete overhaul of company website',
-    status: 'active',
-    priority: 'high',
-    color: '#b026ff',
-    memberCount: 4,
-    taskCount: 12,
-    completedTasks: 5,
-    dueDate: '2026-02-15',
-  },
-  {
-    id: '2',
-    name: 'Mobile App MVP',
-    description: 'Build minimum viable product for mobile app',
-    status: 'active',
-    priority: 'urgent',
-    color: '#ff2d95',
-    memberCount: 3,
-    taskCount: 8,
-    completedTasks: 2,
-    dueDate: '2026-03-01',
-  },
-  {
-    id: '3',
-    name: 'API Integration',
-    description: 'Integrate third-party APIs',
-    status: 'planning',
-    priority: 'medium',
-    color: '#00d4ff',
-    memberCount: 2,
-    taskCount: 6,
-    completedTasks: 0,
-    dueDate: '2026-02-28',
-  },
-];
-
-const mockStats = {
-  totalProjects: 3,
-  activeTasks: 15,
-  completedTasks: 7,
-  teamMembers: 8,
-};
+import useAuthStore from '../stores/authStore';
+import { projectService, taskService } from '../services';
+import { LoadingStates, ErrorStates } from '../components/UI';
 
 export default function DashboardPage() {
-  const [projects, setProjects] = useState(mockProjects);
-  const [stats, setStats] = useState(mockStats);
+  const [projects, setProjects] = useState([]);
+  const [stats, setStats] = useState({
+    totalProjects: 0,
+    activeTasks: 0,
+    completedTasks: 0,
+    teamMembers: 0,
+  });
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
   const theme = useThemeStore((s) => s.theme);
   const isDark = theme === 'dark';
+  const user = useAuthStore((s) => s.user);
+
+  // Fetch projects and calculate stats
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Fetch all projects
+      const projectsResponse = await projectService.getAll();
+      const fetchedProjects = projectsResponse.data || [];
+      
+      // Transform projects to include calculated fields
+      const transformedProjects = await Promise.all(
+        fetchedProjects.map(async (project) => {
+          // Get tasks for each project to calculate taskCount and completedTasks
+          let taskCount = 0;
+          let completedTasks = 0;
+          
+          try {
+            const tasksResponse = await taskService.getByProject(project._id);
+            const tasks = tasksResponse.data || [];
+            taskCount = tasks.length;
+            completedTasks = tasks.filter(task => task.status === 'done' || task.column === 'done').length;
+          } catch (err) {
+            console.error(`Error fetching tasks for project ${project._id}:`, err);
+          }
+          
+          return {
+            id: project._id,
+            name: project.name,
+            description: project.description || '',
+            status: project.status || 'planning',
+            priority: project.priority || 'medium',
+            color: project.color || '#b026ff',
+            memberCount: (project.members?.length || 0) + 1, // +1 for owner
+            taskCount,
+            completedTasks,
+            dueDate: project.dueDate,
+          };
+        })
+      );
+      
+      setProjects(transformedProjects);
+      
+      // Calculate stats
+      const totalProjects = transformedProjects.length;
+      const activeTasks = transformedProjects.reduce((sum, p) => sum + (p.taskCount - p.completedTasks), 0);
+      const completedTasks = transformedProjects.reduce((sum, p) => sum + p.completedTasks, 0);
+      
+      // Calculate unique team members across all projects
+      const uniqueMembers = new Set();
+      fetchedProjects.forEach(project => {
+        if (project.owner?._id) uniqueMembers.add(project.owner._id);
+        project.members?.forEach(member => {
+          if (member.user?._id) uniqueMembers.add(member.user._id);
+        });
+      });
+      
+      setStats({
+        totalProjects,
+        activeTasks,
+        completedTasks,
+        teamMembers: uniqueMembers.size,
+      });
+      
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      setError(err.message || 'Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProjectCreated = () => {
+    setShowNewProjectModal(false);
+    fetchDashboardData(); // Refresh data after creating project
+  };
 
   const getPriorityColor = (priority) => {
     const colors = {
@@ -151,11 +197,15 @@ export default function DashboardPage() {
             isDark ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'
           }`}>
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold">
-              U
+              {user?.name?.charAt(0).toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className={`text-sm font-medium truncate ${isDark ? 'text-white' : 'text-gray-900'}`}>User Name</p>
-              <p className={`text-xs truncate ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>user@example.com</p>
+              <p className={`text-sm font-medium truncate ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                {user?.name || 'User Name'}
+              </p>
+              <p className={`text-xs truncate ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                {user?.email || 'user@example.com'}
+              </p>
             </div>
             <button className={`p-2 transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-400 hover:text-gray-700'}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,48 +241,87 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {[
-            { label: 'Total Projects', value: stats.totalProjects, icon: '📁', color: 'purple' },
-            { label: 'Active Tasks', value: stats.activeTasks, icon: '📋', color: 'pink' },
-            { label: 'Completed', value: stats.completedTasks, icon: '✅', color: 'green' },
-            { label: 'Team Members', value: stats.teamMembers, icon: '👥', color: 'blue' },
-          ].map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={`rounded-2xl p-6 transition-all duration-500 border ${
-                isDark 
-                  ? 'bg-[#12121a] border-white/10 hover:border-purple-500/50' 
-                  : 'bg-white border-gray-200 hover:border-purple-300 shadow-sm'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-3xl">{stat.icon}</span>
-                <div className={`w-12 h-12 rounded-xl bg-${stat.color}-500/20 flex items-center justify-center`}>
-                  <div className={`w-3 h-3 rounded-full bg-${stat.color}-500`}></div>
-                </div>
+        {/* Loading State */}
+        {loading && <LoadingStates.FullPage message="Loading your dashboard..." />}
+
+        {/* Error State */}
+        {error && !loading && (
+          <ErrorStates.Error 
+            message={error} 
+            onRetry={fetchDashboardData}
+          />
+        )}
+
+        {/* Dashboard Content */}
+        {!loading && !error && (
+          <>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {[
+                { label: 'Total Projects', value: stats.totalProjects, icon: '📁', color: 'purple' },
+                { label: 'Active Tasks', value: stats.activeTasks, icon: '📋', color: 'pink' },
+                { label: 'Completed', value: stats.completedTasks, icon: '✅', color: 'green' },
+                { label: 'Team Members', value: stats.teamMembers, icon: '👥', color: 'blue' },
+              ].map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`rounded-2xl p-6 transition-all duration-500 border ${
+                    isDark 
+                      ? 'bg-[#12121a] border-white/10 hover:border-purple-500/50' 
+                      : 'bg-white border-gray-200 hover:border-purple-300 shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-3xl">{stat.icon}</span>
+                    <div className={`w-12 h-12 rounded-xl bg-${stat.color}-500/20 flex items-center justify-center`}>
+                      <div className={`w-3 h-3 rounded-full bg-${stat.color}-500`}></div>
+                    </div>
+                  </div>
+                  <p className={`text-3xl font-bold mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{stat.value}</p>
+                  <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{stat.label}</p>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Projects Section */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Your Projects</h2>
+                <Link to="/projects" className="text-purple-400 hover:text-purple-300 text-sm transition-colors">
+                  View all →
+                </Link>
               </div>
-              <p className={`text-3xl font-bold mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{stat.value}</p>
-              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{stat.label}</p>
-            </motion.div>
-          ))}
-        </div>
 
-        {/* Projects Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Your Projects</h2>
-            <Link to="/projects" className="text-purple-400 hover:text-purple-300 text-sm transition-colors">
-              View all →
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project, index) => (
+              {projects.length === 0 ? (
+                <div className={`rounded-2xl p-12 text-center border transition-colors duration-500 ${
+                  isDark ? 'bg-[#12121a] border-white/10' : 'bg-white border-gray-200 shadow-sm'
+                }`}>
+                  <div className="w-16 h-16 rounded-full bg-purple-500/20 flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                    </svg>
+                  </div>
+                  <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    No projects yet
+                  </h3>
+                  <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                    Get started by creating your first project
+                  </p>
+                  <button
+                    onClick={() => setShowNewProjectModal(true)}
+                    className="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 transition-all"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Create Project
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{projects.map((project, index) => (
               <motion.div
                 key={project.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -306,8 +395,9 @@ export default function DashboardPage() {
                 </Link>
               </motion.div>
             ))}
-          </div>
-        </div>
+                </div>
+              )}
+            </div>
 
         {/* Recent Activity */}
         <div>
@@ -339,18 +429,20 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+        </>
+        )}
       </main>
 
       {/* New Project Modal */}
       {showNewProjectModal && (
-        <NewProjectModal onClose={() => setShowNewProjectModal(false)} />
+        <NewProjectModal onClose={() => setShowNewProjectModal(false)} onSuccess={handleProjectCreated} />
       )}
     </div>
   );
 }
 
 // New Project Modal Component
-function NewProjectModal({ onClose }) {
+function NewProjectModal({ onClose, onSuccess }) {
   const theme = useThemeStore((s) => s.theme);
   const isDark = theme === 'dark';
   const [formData, setFormData] = useState({
@@ -359,12 +451,23 @@ function NewProjectModal({ onClose }) {
     color: '#b026ff',
     priority: 'medium',
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Create project:', formData);
-    // TODO: API call to create project
-    onClose();
+    setLoading(true);
+    setError(null);
+    
+    try {
+      await projectService.create(formData);
+      onSuccess(); // Refresh dashboard data
+    } catch (err) {
+      console.error('Error creating project:', err);
+      setError(err.message || 'Failed to create project');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const colors = ['#b026ff', '#ff2d95', '#00d4ff', '#10b981', '#f59e0b', '#ef4444'];
@@ -391,6 +494,12 @@ function NewProjectModal({ onClose }) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {error && (
+            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+          
           <div>
             <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
               Project Name
@@ -479,9 +588,10 @@ function NewProjectModal({ onClose }) {
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-pink-500 transition-all"
+              disabled={loading}
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-pink-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create Project
+              {loading ? 'Creating...' : 'Create Project'}
             </button>
           </div>
         </form>
