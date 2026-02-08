@@ -3,7 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { KanbanBoard } from '../components/Kanban';
 import { MilestoneList, MilestoneProgress } from '../components/Milestones';
 import { useSocket } from '../socket';
-import { OnlineUsers } from '../components/UI';
+import { OnlineUsers, LoadingStates, ErrorStates } from '../components/UI';
+import { projectService, taskService } from '../services';
 
 export default function ProjectPage() {
   const { projectId } = useParams();
@@ -11,6 +12,7 @@ export default function ProjectPage() {
   const [tasks, setTasks] = useState([]);
   const [milestones, setMilestones] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [viewMode, setViewMode] = useState('board'); // board, list, timeline
   const [showMilestones, setShowMilestones] = useState(true);
   const { joinProjectRoom, leaveProjectRoom, onlineUsers, isConnected } = useSocket();
@@ -28,223 +30,271 @@ export default function ProjectPage() {
     };
   }, [projectId, isConnected, joinProjectRoom, leaveProjectRoom]);
 
-  // Mock data for now - will be replaced with API calls
+  // Fetch project data from API
   useEffect(() => {
-    // Simulate loading
-    const mockProject = {
-      id: projectId,
-      name: 'Project Alpha',
-      description: 'A collaborative project for the intern team to build amazing features.',
-      color: '#b026ff',
-      status: 'active',
-      priority: 'high',
-      taskColumns: [
-        { id: 'backlog', name: 'Backlog', color: '#6b7280', order: 0 },
-        { id: 'todo', name: 'To Do', color: '#3b82f6', order: 1 },
-        { id: 'in-progress', name: 'In Progress', color: '#f59e0b', order: 2 },
-        { id: 'review', name: 'Review', color: '#8b5cf6', order: 3 },
-        { id: 'done', name: 'Done', color: '#10b981', order: 4 },
-      ],
-      members: [
-        { id: '1', name: 'John Doe', role: 'owner', avatar: null },
-        { id: '2', name: 'Jane Smith', role: 'member', avatar: null },
-        { id: '3', name: 'Bob Wilson', role: 'member', avatar: null },
-      ],
-      milestones: [
-        { id: '1', title: 'Phase 1 Complete', dueDate: '2024-02-01', status: 'completed' },
-        { id: '2', title: 'Beta Release', dueDate: '2024-03-15', status: 'in-progress' },
-      ],
-      createdAt: '2024-01-15',
-    };
-
-    const mockTasks = [
-      {
-        id: '1',
-        title: 'Design system setup',
-        description: 'Create the foundational design tokens and component library',
-        column: 'done',
-        order: 0,
-        priority: 'high',
-        labels: [{ name: 'Design', color: '#ff2d95' }],
-        assignees: [{ id: '1', name: 'John Doe' }],
-        checklist: [
-          { text: 'Color tokens', isCompleted: true },
-          { text: 'Typography scale', isCompleted: true },
-          { text: 'Spacing system', isCompleted: true },
-        ],
-        comments: [{ id: '1', text: 'Looks great!' }],
-        dueDate: '2024-01-20',
-      },
-      {
-        id: '2',
-        title: 'User authentication flow',
-        description: 'Implement login, register, and password reset functionality',
-        column: 'in-progress',
-        order: 0,
-        priority: 'urgent',
-        labels: [{ name: 'Backend', color: '#00d4ff' }, { name: 'Security', color: '#ff5555' }],
-        assignees: [{ id: '2', name: 'Jane Smith' }, { id: '3', name: 'Bob Wilson' }],
-        checklist: [
-          { text: 'Login endpoint', isCompleted: true },
-          { text: 'Register endpoint', isCompleted: true },
-          { text: 'JWT tokens', isCompleted: false },
-          { text: 'Password reset', isCompleted: false },
-        ],
-        comments: [],
-        dueDate: '2024-01-25',
-      },
-      {
-        id: '3',
-        title: 'Dashboard UI',
-        description: 'Build the main dashboard interface with stats and recent activity',
-        column: 'review',
-        order: 0,
-        priority: 'medium',
-        labels: [{ name: 'Frontend', color: '#b026ff' }],
-        assignees: [{ id: '1', name: 'John Doe' }],
-        checklist: [],
-        comments: [{ id: '1', text: 'Ready for review' }],
-        dueDate: '2024-01-28',
-      },
-      {
-        id: '4',
-        title: 'API documentation',
-        description: 'Document all API endpoints with examples',
-        column: 'todo',
-        order: 0,
-        priority: 'low',
-        labels: [{ name: 'Documentation', color: '#00ff88' }],
-        assignees: [],
-        checklist: [],
-        comments: [],
-        dueDate: null,
-      },
-      {
-        id: '5',
-        title: 'Real-time notifications',
-        description: 'Implement Socket.IO for live updates and notifications',
-        column: 'backlog',
-        order: 0,
-        priority: 'medium',
-        labels: [{ name: 'Backend', color: '#00d4ff' }, { name: 'Feature', color: '#ffaa00' }],
-        assignees: [],
-        checklist: [],
-        comments: [],
-        dueDate: '2024-02-15',
-      },
-      {
-        id: '6',
-        title: 'Mobile responsive design',
-        description: 'Ensure all pages work well on mobile devices',
-        column: 'backlog',
-        order: 1,
-        priority: 'high',
-        labels: [{ name: 'Frontend', color: '#b026ff' }, { name: 'Design', color: '#ff2d95' }],
-        assignees: [],
-        checklist: [],
-        comments: [],
-        dueDate: null,
-      },
-    ];
-
-    const mockMilestones = [
-      {
-        id: '1',
-        title: 'Phase 1 Complete',
-        description: 'Complete all foundation work including design system and authentication',
-        dueDate: '2024-02-01',
-        completed: true,
-        project: projectId,
-      },
-      {
-        id: '2',
-        title: 'Beta Release',
-        description: 'Launch the beta version with core features for testing',
-        dueDate: '2024-03-15',
-        completed: false,
-        project: projectId,
-      },
-      {
-        id: '3',
-        title: 'Public Launch',
-        description: 'Official release with all planned features',
-        dueDate: '2024-04-30',
-        completed: false,
-        project: projectId,
-      },
-    ];
-
-    setTimeout(() => {
-      setProject(mockProject);
-      setTasks(mockTasks);
-      setMilestones(mockMilestones);
-      setLoading(false);
-    }, 500);
+    fetchProjectData();
   }, [projectId]);
 
-  const handleAddTask = (taskData) => {
-    const newTask = {
-      id: Date.now().toString(),
-      ...taskData,
-      order: tasks.filter((t) => t.column === taskData.column).length,
-      comments: [],
-    };
-    setTasks([...tasks, newTask]);
+  const fetchProjectData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Fetch project details
+      const projectResponse = await projectService.getById(projectId);
+      const projectData = projectResponse.data;
+      
+      // Fetch tasks for this project
+      const tasksResponse = await taskService.getByProject(projectId);
+      const tasksData = tasksResponse.data || [];
+      
+      // Transform project data to match component expectations
+      const transformedProject = {
+        id: projectData._id,
+        name: projectData.name,
+        description: projectData.description || '',
+        color: projectData.color || '#b026ff',
+        status: projectData.status || 'active',
+        priority: projectData.priority || 'medium',
+        taskColumns: projectData.taskColumns || [
+          { id: 'backlog', name: 'Backlog', color: '#6b7280', order: 0 },
+          { id: 'todo', name: 'To Do', color: '#3b82f6', order: 1 },
+          { id: 'in-progress', name: 'In Progress', color: '#f59e0b', order: 2 },
+          { id: 'review', name: 'Review', color: '#8b5cf6', order: 3 },
+          { id: 'done', name: 'Done', color: '#10b981', order: 4 },
+        ],
+        members: [
+          ...(projectData.owner ? [{
+            id: projectData.owner._id || projectData.owner,
+            name: projectData.owner.name || 'Owner',
+            email: projectData.owner.email,
+            role: 'owner',
+            avatar: projectData.owner.avatar || null,
+          }] : []),
+          ...(projectData.members || []).map(m => ({
+            id: m.user?._id || m.user,
+            name: m.user?.name || 'Member',
+            email: m.user?.email,
+            role: m.role || 'member',
+            avatar: m.user?.avatar || null,
+          })),
+        ],
+        createdAt: projectData.createdAt,
+      };
+      
+      // Transform tasks
+      const transformedTasks = tasksData.map(task => ({
+        id: task._id,
+        title: task.title,
+        description: task.description || '',
+        column: task.column || 'backlog',
+        order: task.order || 0,
+        priority: task.priority || 'medium',
+        labels: task.labels || [],
+        assignees: (task.assignees || []).map(a => ({
+          id: a._id || a,
+          name: a.name || 'User',
+          email: a.email,
+          avatar: a.avatar,
+        })),
+        checklist: task.checklist || [],
+        comments: task.comments || [],
+        dueDate: task.dueDate || null,
+      }));
+      
+      // Extract milestones from project
+      const transformedMilestones = (projectData.milestones || []).map(m => ({
+        id: m._id,
+        title: m.title,
+        description: m.description || '',
+        dueDate: m.dueDate,
+        completed: m.completed || false,
+        project: projectId,
+      }));
+      
+      setProject(transformedProject);
+      setTasks(transformedTasks);
+      setMilestones(transformedMilestones);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching project data:', err);
+      setError(err.message || 'Failed to load project');
+      setLoading(false);
+    }
   };
 
-  const handleUpdateTask = (taskId, updates) => {
-    setTasks(tasks.map((t) => (t.id === taskId ? { ...t, ...updates } : t)));
+  const handleAddTask = async (taskData) => {
+    try {
+      const response = await taskService.create({
+        ...taskData,
+        project: projectId,
+      });
+      
+      if (response.success && response.data) {
+        const newTask = {
+          id: response.data._id,
+          title: response.data.title,
+          description: response.data.description || '',
+          column: response.data.column || taskData.column,
+          order: response.data.order || 0,
+          priority: response.data.priority || 'medium',
+          labels: response.data.labels || [],
+          assignees: (response.data.assignees || []).map(a => ({
+            id: a._id || a,
+            name: a.name || 'User',
+            email: a.email,
+            avatar: a.avatar,
+          })),
+          checklist: response.data.checklist || [],
+          comments: response.data.comments || [],
+          dueDate: response.data.dueDate || null,
+        };
+        setTasks([...tasks, newTask]);
+      }
+    } catch (err) {
+      console.error('Error creating task:', err);
+    }
   };
 
-  const handleDeleteTask = (taskId) => {
-    setTasks(tasks.filter((t) => t.id !== taskId));
+  const handleUpdateTask = async (taskId, updates) => {
+    try {
+      const response = await taskService.update(taskId, updates);
+      
+      if (response.success && response.data) {
+        setTasks(tasks.map((t) => {
+          if (t.id === taskId) {
+            return {
+              ...t,
+              ...updates,
+              assignees: response.data.assignees ? (response.data.assignees || []).map(a => ({
+                id: a._id || a,
+                name: a.name || 'User',
+                email: a.email,
+                avatar: a.avatar,
+              })) : t.assignees,
+            };
+          }
+          return t;
+        }));
+      }
+    } catch (err) {
+      console.error('Error updating task:', err);
+    }
   };
 
-  const handleMoveTask = (taskId, newColumn, newOrder) => {
+  const handleDeleteTask = async (taskId) => {
+    try {
+      const response = await taskService.delete(taskId);
+      
+      if (response.success) {
+        setTasks(tasks.filter((t) => t.id !== taskId));
+      }
+    } catch (err) {
+      console.error('Error deleting task:', err);
+    }
+  };
+
+  const handleMoveTask = async (taskId, newColumn, newOrder) => {
+    // Optimistic update
+    const oldTasks = [...tasks];
     setTasks(
       tasks.map((t) =>
         t.id === taskId ? { ...t, column: newColumn, order: newOrder } : t
       )
     );
+    
+    try {
+      await taskService.move(taskId, { column: newColumn, order: newOrder });
+    } catch (err) {
+      console.error('Error moving task:', err);
+      // Revert on error
+      setTasks(oldTasks);
+    }
   };
 
   // Milestone handlers
-  const handleAddMilestone = (milestoneData) => {
-    const newMilestone = {
-      id: Date.now().toString(),
-      ...milestoneData,
-      completed: false,
-    };
-    setMilestones([...milestones, newMilestone]);
+  const handleAddMilestone = async (milestoneData) => {
+    try {
+      const response = await projectService.addMilestone(projectId, milestoneData);
+      
+      if (response.success && response.data) {
+        // Extract the new milestone from updated project
+        const updatedMilestones = response.data.milestones || [];
+        const transformedMilestones = updatedMilestones.map(m => ({
+          id: m._id,
+          title: m.title,
+          description: m.description || '',
+          dueDate: m.dueDate,
+          completed: m.completed || false,
+          project: projectId,
+        }));
+        setMilestones(transformedMilestones);
+      }
+    } catch (err) {
+      console.error('Error adding milestone:', err);
+    }
   };
 
-  const handleUpdateMilestone = (milestoneId, updates) => {
-    setMilestones(
-      milestones.map((m) => 
-        (m.id === milestoneId || m._id === milestoneId) ? { ...m, ...updates } : m
-      )
-    );
+  const handleUpdateMilestone = async (milestoneId, updates) => {
+    try {
+      const response = await projectService.updateMilestone(projectId, milestoneId, updates);
+      
+      if (response.success && response.data) {
+        const updatedMilestones = response.data.milestones || [];
+        const transformedMilestones = updatedMilestones.map(m => ({
+          id: m._id,
+          title: m.title,
+          description: m.description || '',
+          dueDate: m.dueDate,
+          completed: m.completed || false,
+          project: projectId,
+        }));
+        setMilestones(transformedMilestones);
+      }
+    } catch (err) {
+      console.error('Error updating milestone:', err);
+    }
   };
 
-  const handleDeleteMilestone = (milestoneId) => {
-    setMilestones(milestones.filter((m) => m.id !== milestoneId && m._id !== milestoneId));
+  const handleDeleteMilestone = async (milestoneId) => {
+    try {
+      const response = await projectService.deleteMilestone(projectId, milestoneId);
+      
+      if (response.success) {
+        setMilestones(milestones.filter((m) => m.id !== milestoneId && m._id !== milestoneId));
+      }
+    } catch (err) {
+      console.error('Error deleting milestone:', err);
+    }
   };
 
-  const handleToggleMilestone = (milestoneId, completed) => {
-    setMilestones(
-      milestones.map((m) => 
-        (m.id === milestoneId || m._id === milestoneId) ? { ...m, completed } : m
-      )
-    );
+  const handleToggleMilestone = async (milestoneId, completed) => {
+    try {
+      const response = await projectService.updateMilestone(projectId, milestoneId, { completed });
+      
+      if (response.success) {
+        setMilestones(
+          milestones.map((m) => 
+            (m.id === milestoneId || m._id === milestoneId) ? { ...m, completed } : m
+          )
+        );
+      }
+    } catch (err) {
+      console.error('Error toggling milestone:', err);
+    }
   };
 
   if (loading) {
+    return <LoadingStates.FullPage message="Loading project..." />;
+  }
+
+  if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-          <p className="text-gray-400">Loading project...</p>
-        </div>
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
+        <ErrorStates.Error
+          message={error}
+          onRetry={fetchProjectData}
+        />
       </div>
     );
   }
