@@ -1,5 +1,11 @@
 import Task from '../models/Task.js';
 import Project from '../models/Project.js';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // @desc    Create new task
 // @route   POST /api/projects/:projectId/tasks
@@ -474,6 +480,237 @@ export const toggleChecklistItem = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error updating checklist',
+    });
+  }
+};
+
+// @desc    Upload file attachment to task
+// @route   POST /api/tasks/:id/attachments
+// @access  Private
+export const uploadAttachment = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded',
+      });
+    }
+
+    const task = await Task.findById(req.params.id);
+
+    if (!task) {
+      // Delete uploaded file if task not found
+      fs.unlinkSync(req.file.path);
+      return res.status(404).json({
+        success: false,
+        message: 'Task not found',
+      });
+    }
+
+    // Check project access
+    const project = await Project.findById(task.project);
+    const userRole = project.getUserRole(req.user.id);
+    if (!userRole || userRole === 'viewer') {
+      // Delete uploaded file if not authorized
+      fs.unlinkSync(req.file.path);
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to upload attachments to this task',
+      });
+    }
+
+    // Create attachment object
+    const attachment = {
+      name: req.file.originalname,
+      url: `/uploads/${req.file.filename}`,
+      type: req.file.mimetype,
+      size: req.file.size,
+      uploadedBy: req.user.id,
+      uploadedAt: new Date(),
+    };
+
+    // Add attachment to task
+    task.attachments.push(attachment);
+    task.logActivity(req.user.id, 'attachment_added', { 
+      fileName: req.file.originalname,
+      fileSize: req.file.size 
+    });
+    await task.save();
+
+    // Populate the uploaded attachment
+    const populatedTask = await Task.findById(task._id)
+      .populate('attachments.uploadedBy', 'name email avatar');
+
+    const newAttachment = populatedTask.attachments[populatedTask.attachments.length - 1];
+
+    // Emit socket event
+    const io = req.app.get('io');
+    io.to(`project-${task.project}`).emit('task:attachmentAdded', {
+      taskId: task._id,
+      attachment: newAttachment,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'File uploaded successfully',
+      data: newAttachment,
+    });
+  } catch (error) {
+    console.error('Upload attachment error:', error);
+    // Clean up uploaded file on error
+    if (req.file && req.file.path) {
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (unlinkError) {
+        console.error('Error deleting file:', unlinkError);
+      }
+    }
+    res.status(500).json({
+      success: false,
+      message: 'Server error uploading file',
+    });
+  }
+};
+
+// @desc    Delete file attachment from task
+// @route   DELETE /api/tasks/:id/attachments/:attachmentId
+// @access  Private
+export const deleteAttachment = async (req, res) => {
+  try {
+    const { id, attachmentId } = req.params;
+
+    const task = await Task.findById(id);
+
+    if (!task) {
+      return res.status(404).json({
+        success: false,
+        message: 'Task not found',
+      });
+    }
+
+    // Check project access
+    const project = await Project.findById(task.project);
+    const userRole = project.getUserRole(req.user.id);
+    if (!userRole || userRole === 'viewer') {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to delete attachments from this task',
+      });
+    }
+
+    // Find attachment
+    const attachment = task.attachments.id(attachmentId);
+    if (!attachment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Attachment not found',
+      });
+    }
+
+    // Only the uploader, task creator, or project owner/admin can delete
+    const isUploader = attachment.uploadedBy.toString() === req.user.id;
+    const isTaskCreator = task.createdBy.toString() === req.user.id;
+    const isOwnerOrAdmin = userRole === 'owner' || userRole === 'admin';
+
+    if (!isUploader && !isTaskCreator && !isOwnerOrAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to delete this attachment',
+      });
+    }
+
+    // Delete file from filesystem
+    const filePath = path.join(__dirname, '../../', attachment.url);
+    if (fs.existsSync(filePath)) {
+      try {
+        fs.unlinkSync(filePath);
+      } catch (error) {
+        console.error('Error deleting file from filesystem:', error);
+      }
+    }
+
+    // Remove attachment from task
+    const fileName = attachment.name;
+    task.attachments.pull(attachmentId);
+    task.logActivity(req.user.id, 'attachment_deleted', { fileName });
+    await task.save();
+
+    // Emit socket event
+    const io = req.app.get('io');
+    io.to(`project-${task.project}`).emit('task:attachmentDeleted', {
+      taskId: task._id,
+      attachmentId,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Attachment deleted successfully',
+    });
+  } catch (error) {
+    console.error('Delete attachment error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error deleting attachment',
+    });
+  }
+};
+
+// @desc    Download file attachment
+// @route   GET /api/tasks/:id/attachments/:attachmentId/download
+// @access  Private
+export const downloadAttachment = async (req, res) => {
+  try {
+    const { id, attachmentId } = req.params;
+
+    const task = await Task.findById(id);
+
+    if (!task) {
+      return res.status(404).json({
+        success: false,
+        message: 'Task not found',
+      });
+    }
+
+    // Check project access
+    const project = await Project.findById(task.project);
+    if (!project.isMember(req.user.id)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to access this task',
+      });
+    }
+
+    // Find attachment
+    const attachment = task.attachments.id(attachmentId);
+    if (!attachment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Attachment not found',
+      });
+    }
+
+    // Get file path
+    const filePath = path.join(__dirname, '../../', attachment.url);
+    
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({
+        success: false,
+        message: 'File not found on server',
+      });
+    }
+
+    // Set headers for download
+    res.setHeader('Content-Type', attachment.type);
+    res.setHeader('Content-Disposition', `attachment; filename="${attachment.name}"`);
+    
+    // Send file
+    res.sendFile(filePath);
+  } catch (error) {
+    console.error('Download attachment error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error downloading file',
     });
   }
 };

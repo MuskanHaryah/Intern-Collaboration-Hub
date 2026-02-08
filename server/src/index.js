@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import config from './config/index.js';
 import connectDB from './config/database.js';
@@ -11,6 +13,9 @@ import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
 import taskRoutes from './routes/tasks.js';
 import { setupSocketHandlers } from './socket/index.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Initialize Express app
 const app = express();
@@ -40,6 +45,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Make io accessible to routes
 app.set('io', io);
+
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Health check route
 app.get('/api/health', (req, res) => {

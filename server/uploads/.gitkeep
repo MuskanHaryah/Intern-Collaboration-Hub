@@ -1,0 +1,13 @@
+# Uploads Directory
+
+This directory stores file attachments uploaded by users.
+
+**Note:** This directory is excluded from version control via `.gitignore`. Files uploaded here are stored locally on the server.
+
+## Directory Structure
+- Files are stored with unique names to prevent conflicts
+- Each filename includes a timestamp and random string for uniqueness
+
+## Cleanup
+- Consider implementing periodic cleanup of old/unused files
+- Implement backup strategy for production deployments
