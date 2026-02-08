@@ -3,8 +3,12 @@ import { motion } from 'framer-motion';
 import ThemeToggle from '../components/UI/ThemeToggle';
 import useThemeStore from '../stores/themeStore';
 
+console.log('📄 [HomePage.jsx] HomePage component loaded');
+
 export default function HomePage() {
+  console.log('🏠 [HomePage.jsx] HomePage rendering...');
   const theme = useThemeStore((s) => s.theme);
+  console.log('🎨 [HomePage.jsx] Current theme:', theme);
   const isDark = theme === 'dark';
 
   return (

@@ -285,13 +285,13 @@ export default function ProjectPage() {
   };
 
   if (loading) {
-    return <LoadingStates.FullPage message="Loading project..." />;
+    return <LoadingStates.LoadingOverlay fullScreen message="Loading project..." />;
   }
 
   if (error) {
     return (
       <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
-        <ErrorStates.Error
+        <ErrorStates.ErrorMessage
           message={error}
           onRetry={fetchProjectData}
         />

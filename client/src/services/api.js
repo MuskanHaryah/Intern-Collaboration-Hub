@@ -1,5 +1,9 @@
 import axios from 'axios';
 
+console.log('🌐 [api.js] Initializing API client...');
+console.log('🌐 [api.js] VITE_API_URL:', import.meta.env.VITE_API_URL);
+console.log('🌐 [api.js] Base URL:', import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
+
 // Create axios instance with default config
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
@@ -8,6 +12,8 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+console.log('✅ [api.js] API client created successfully');
 
 // Request interceptor - add auth token to requests
 api.interceptors.request.use(

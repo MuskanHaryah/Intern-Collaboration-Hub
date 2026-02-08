@@ -29,11 +29,19 @@ const useThemeStore = create(
       
       // Initialize theme from stored preference
       initializeTheme: () => {
-        const { theme } = get();
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
+        console.log('🎨 [themeStore] Initializing theme...');
+        try {
+          const { theme } = get();
+          console.log('🎨 [themeStore] Current theme:', theme);
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            console.log('✅ [themeStore] Dark theme applied');
+          } else {
+            document.documentElement.classList.remove('dark');
+            console.log('✅ [themeStore] Light theme applied');
+          }
+        } catch (error) {
+          console.error('❌ [themeStore] Error during theme initialization:', error);
         }
       },
 

@@ -13,10 +13,20 @@ const useAuthStore = create(
 
       // Initialize auth state from localStorage
       initialize: () => {
-        const token = localStorage.getItem('token');
-        const user = authService.getStoredUser();
-        if (token && user) {
-          set({ user, token, isAuthenticated: true });
+        console.log('🔐 [authStore] Initializing auth state...');
+        try {
+          const token = localStorage.getItem('token');
+          const user = authService.getStoredUser();
+          console.log('🔐 [authStore] Token:', token ? 'Present' : 'None');
+          console.log('🔐 [authStore] User:', user ? user.email : 'None');
+          if (token && user) {
+            set({ user, token, isAuthenticated: true });
+            console.log('✅ [authStore] Auth initialized with existing session');
+          } else {
+            console.log('ℹ️ [authStore] No existing session');
+          }
+        } catch (error) {
+          console.error('❌ [authStore] Error during initialization:', error);
         }
       },
 

@@ -3,23 +3,30 @@ import { useAuthStore } from '../stores';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
 
+console.log('🔌 [socketClient.js] Socket client loaded');
+console.log('🔌 [socketClient.js] SOCKET_URL:', SOCKET_URL);
+
 let socket = null;
 
 /**
  * Initialize socket connection with authentication
  */
 export const initializeSocket = () => {
+  console.log('🔌 [socketClient.js] initializeSocket called');
   const token = useAuthStore.getState().token;
+  console.log('🔌 [socketClient.js] Token:', token ? 'Present' : 'None');
   
   if (!token) {
-    console.warn('No token available for socket connection');
+    console.warn('⚠️ [socketClient.js] No token available for socket connection');
     return null;
   }
 
   if (socket?.connected) {
+    console.log('✅ [socketClient.js] Socket already connected');
     return socket;
   }
 
+  console.log('🔌 [socketClient.js] Creating new socket connection...');
   socket = io(SOCKET_URL, {
     auth: { token },
     transports: ['websocket', 'polling'],

@@ -242,11 +242,11 @@ export default function DashboardPage() {
         </div>
 
         {/* Loading State */}
-        {loading && <LoadingStates.FullPage message="Loading your dashboard..." />}
+        {loading && <LoadingStates.LoadingOverlay fullScreen message="Loading your dashboard..." />}
 
         {/* Error State */}
         {error && !loading && (
-          <ErrorStates.Error 
+          <ErrorStates.ErrorMessage 
             message={error} 
             onRetry={fetchDashboardData}
           />
