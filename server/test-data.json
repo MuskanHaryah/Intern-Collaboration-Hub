@@ -1,0 +1,193 @@
+{
+  "users": [
+    {
+      "name": "Alice Johnson",
+      "email": "alice@example.com",
+      "password": "password123",
+      "role": "mentor"
+    },
+    {
+      "name": "Bob Smith",
+      "email": "bob@example.com",
+      "password": "password123",
+      "role": "intern"
+    },
+    {
+      "name": "Carol Williams",
+      "email": "carol@example.com",
+      "password": "password123",
+      "role": "intern"
+    },
+    {
+      "name": "David Brown",
+      "email": "david@example.com",
+      "password": "password123",
+      "role": "admin"
+    }
+  ],
+  "projects": [
+    {
+      "name": "E-Commerce Platform",
+      "description": "Build a modern e-commerce platform with React and Node.js",
+      "deadline": "2024-12-31",
+      "tasks": [
+        {
+          "title": "Set up project structure",
+          "description": "Initialize React app and Node.js server with proper folder structure",
+          "column": "done",
+          "priority": "high",
+          "tags": ["setup", "infrastructure"]
+        },
+        {
+          "title": "Design database schema",
+          "description": "Create MongoDB models for users, products, orders, and cart",
+          "column": "done",
+          "priority": "high",
+          "tags": ["database", "backend"]
+        },
+        {
+          "title": "Implement user authentication",
+          "description": "Add JWT-based authentication with register, login, and logout",
+          "column": "in-progress",
+          "priority": "high",
+          "tags": ["auth", "security"]
+        },
+        {
+          "title": "Create product catalog UI",
+          "description": "Build product listing page with filters and search",
+          "column": "todo",
+          "priority": "medium",
+          "tags": ["frontend", "ui"]
+        },
+        {
+          "title": "Implement shopping cart",
+          "description": "Add cart functionality with add, remove, and update quantities",
+          "column": "todo",
+          "priority": "medium",
+          "tags": ["frontend", "feature"]
+        }
+      ]
+    },
+    {
+      "name": "Mobile App Development",
+      "description": "Cross-platform mobile app using React Native",
+      "deadline": "2025-03-31",
+      "tasks": [
+        {
+          "title": "Setup React Native environment",
+          "description": "Install and configure React Native development environment",
+          "column": "done",
+          "priority": "high",
+          "tags": ["setup", "mobile"]
+        },
+        {
+          "title": "Design app navigation",
+          "description": "Implement navigation structure with React Navigation",
+          "column": "in-progress",
+          "priority": "high",
+          "tags": ["navigation", "architecture"]
+        },
+        {
+          "title": "Create home screen",
+          "description": "Design and implement the main home screen",
+          "column": "todo",
+          "priority": "medium",
+          "tags": ["ui", "screen"]
+        },
+        {
+          "title": "Add push notifications",
+          "description": "Integrate Firebase Cloud Messaging for notifications",
+          "column": "todo",
+          "priority": "low",
+          "tags": ["feature", "notifications"]
+        }
+      ]
+    },
+    {
+      "name": "API Documentation Portal",
+      "description": "Interactive API documentation website",
+      "deadline": "2024-11-30",
+      "tasks": [
+        {
+          "title": "Research documentation tools",
+          "description": "Evaluate Swagger, Postman, and custom solutions",
+          "column": "done",
+          "priority": "medium",
+          "tags": ["research", "documentation"]
+        },
+        {
+          "title": "Set up documentation framework",
+          "description": "Choose and configure documentation tool",
+          "column": "in-progress",
+          "priority": "high",
+          "tags": ["setup", "docs"]
+        },
+        {
+          "title": "Write API endpoint documentation",
+          "description": "Document all REST API endpoints with examples",
+          "column": "todo",
+          "priority": "high",
+          "tags": ["documentation", "api"]
+        },
+        {
+          "title": "Add interactive examples",
+          "description": "Create runnable code examples for each endpoint",
+          "column": "todo",
+          "priority": "medium",
+          "tags": ["examples", "interactive"]
+        },
+        {
+          "title": "Deploy documentation site",
+          "description": "Host documentation on GitHub Pages or Vercel",
+          "column": "todo",
+          "priority": "medium",
+          "tags": ["deployment", "hosting"]
+        }
+      ]
+    }
+  ],
+  "comments": [
+    {
+      "text": "Great work on the initial setup! The structure looks clean."
+    },
+    {
+      "text": "Should we use PostgreSQL instead of MongoDB for this?"
+    },
+    {
+      "text": "I've completed the auth implementation. Ready for review."
+    },
+    {
+      "text": "Need help with the state management. Should we use Redux or Context API?"
+    },
+    {
+      "text": "This feature is blocked by the backend API not being ready yet."
+    }
+  ],
+  "tags": [
+    "setup",
+    "infrastructure",
+    "database",
+    "backend",
+    "frontend",
+    "ui",
+    "auth",
+    "security",
+    "feature",
+    "mobile",
+    "navigation",
+    "architecture",
+    "screen",
+    "notifications",
+    "research",
+    "documentation",
+    "api",
+    "examples",
+    "interactive",
+    "deployment",
+    "hosting",
+    "bug",
+    "enhancement",
+    "urgent",
+    "low-priority"
+  ]
+}

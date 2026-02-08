@@ -1,0 +1,373 @@
+###
+### Intern Collaboration Hub - API Tests
+### Use with REST Client extension in VS Code
+### Click "Send Request" above each request to test
+###
+
+### Variables
+@baseUrl = http://localhost:5000/api
+@token = YOUR_TOKEN_HERE
+@projectId = YOUR_PROJECT_ID_HERE
+@taskId = YOUR_TASK_ID_HERE
+@userId = YOUR_USER_ID_HERE
+
+###############################################
+### 🔐 AUTHENTICATION ENDPOINTS
+###############################################
+
+### 1. Register New User
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "password": "password123",
+  "role": "intern"
+}
+
+### 2. Login User
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Extract token from login response (automatic)
+@authToken = {{login.response.body.token}}
+
+### 3. Get Current User
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{authToken}}
+
+### 4. Update Profile
+PUT {{baseUrl}}/auth/profile
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated User Name",
+  "email": "updated@example.com"
+}
+
+### 5. Change Password
+PUT {{baseUrl}}/auth/password
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "password123",
+  "newPassword": "newpassword456"
+}
+
+### 6. Logout
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{authToken}}
+
+###############################################
+### 📁 PROJECT ENDPOINTS
+###############################################
+
+### 1. Get All Projects
+GET {{baseUrl}}/projects
+Authorization: Bearer {{authToken}}
+
+### 2. Create New Project
+# @name createProject
+POST {{baseUrl}}/projects
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Project",
+  "description": "This is a test project for API testing",
+  "deadline": "2024-12-31",
+  "members": []
+}
+
+### Extract project ID from create response
+@newProjectId = {{createProject.response.body.project._id}}
+
+### 3. Get Single Project
+GET {{baseUrl}}/projects/{{newProjectId}}
+Authorization: Bearer {{authToken}}
+
+### 4. Update Project
+PUT {{baseUrl}}/projects/{{newProjectId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Test Project",
+  "description": "Updated description for testing"
+}
+
+### 5. Add Member to Project
+POST {{baseUrl}}/projects/{{newProjectId}}/members
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "role": "member"
+}
+
+### 6. Remove Member from Project
+DELETE {{baseUrl}}/projects/{{newProjectId}}/members/{{userId}}
+Authorization: Bearer {{authToken}}
+
+### 7. Delete Project
+DELETE {{baseUrl}}/projects/{{newProjectId}}
+Authorization: Bearer {{authToken}}
+
+###############################################
+### ✅ TASK ENDPOINTS
+###############################################
+
+### 1. Get All Tasks for Project
+GET {{baseUrl}}/projects/{{newProjectId}}/tasks
+Authorization: Bearer {{authToken}}
+
+### 2. Create New Task
+# @name createTask
+POST {{baseUrl}}/projects/{{newProjectId}}/tasks
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "title": "Test Task",
+  "description": "This is a test task",
+  "column": "todo",
+  "priority": "high",
+  "deadline": "2024-12-31",
+  "assignees": [],
+  "tags": ["test", "api"]
+}
+
+### Extract task ID from create response
+@newTaskId = {{createTask.response.body.task._id}}
+
+### 3. Get Single Task
+GET {{baseUrl}}/tasks/{{newTaskId}}
+Authorization: Bearer {{authToken}}
+
+### 4. Update Task
+PUT {{baseUrl}}/tasks/{{newTaskId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "title": "Updated Test Task",
+  "description": "Updated description",
+  "priority": "medium"
+}
+
+### 5. Move Task to Different Column
+PUT {{baseUrl}}/tasks/{{newTaskId}}/move
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "column": "in-progress",
+  "order": 1
+}
+
+### 6. Add Comment to Task
+POST {{baseUrl}}/tasks/{{newTaskId}}/comments
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "text": "This is a test comment on the task"
+}
+
+### 7. Toggle Checklist Item
+# Note: You need a checklist item ID from the task
+PUT {{baseUrl}}/tasks/{{newTaskId}}/checklist/CHECKLIST_ITEM_ID
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "completed": true
+}
+
+### 8. Delete Task
+DELETE {{baseUrl}}/tasks/{{newTaskId}}
+Authorization: Bearer {{authToken}}
+
+###############################################
+### 📎 FILE ATTACHMENT ENDPOINTS
+###############################################
+
+### 1. Upload Attachment to Task
+# Note: Replace path/to/file.pdf with actual file path
+POST {{baseUrl}}/tasks/{{newTaskId}}/attachments
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="test.pdf"
+Content-Type: application/pdf
+
+< ./test-files/sample.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### 2. Download Attachment
+# Note: Replace ATTACHMENT_ID with actual attachment ID
+GET {{baseUrl}}/tasks/{{newTaskId}}/attachments/ATTACHMENT_ID/download
+Authorization: Bearer {{authToken}}
+
+### 3. Delete Attachment
+# Note: Replace ATTACHMENT_ID with actual attachment ID
+DELETE {{baseUrl}}/tasks/{{newTaskId}}/attachments/ATTACHMENT_ID
+Authorization: Bearer {{authToken}}
+
+###############################################
+### 🧪 ERROR TESTING
+###############################################
+
+### Test 1: Access Protected Route Without Token (should return 401)
+GET {{baseUrl}}/projects
+
+### Test 2: Login with Invalid Credentials (should return 401)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "invalid@example.com",
+  "password": "wrongpassword"
+}
+
+### Test 3: Create Project with Missing Fields (should return 400)
+POST {{baseUrl}}/projects
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "description": "Missing name field"
+}
+
+### Test 4: Get Non-Existent Project (should return 404)
+GET {{baseUrl}}/projects/000000000000000000000000
+Authorization: Bearer {{authToken}}
+
+### Test 5: Register with Duplicate Email (should return 400)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Duplicate User",
+  "email": "test@example.com",
+  "password": "password123",
+  "role": "intern"
+}
+
+###############################################
+### 🔄 COMPLETE WORKFLOW TEST
+###############################################
+
+### Step 1: Register a new user
+# @name registerUser
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Workflow Test User",
+  "email": "workflow@example.com",
+  "password": "test123",
+  "role": "intern"
+}
+
+@workflowToken = {{registerUser.response.body.token}}
+
+### Step 2: Create a project
+# @name workflowProject
+POST {{baseUrl}}/projects
+Authorization: Bearer {{workflowToken}}
+Content-Type: application/json
+
+{
+  "name": "Workflow Test Project",
+  "description": "End-to-end workflow test"
+}
+
+@workflowProjectId = {{workflowProject.response.body.project._id}}
+
+### Step 3: Create a task in the project
+# @name workflowTask
+POST {{baseUrl}}/projects/{{workflowProjectId}}/tasks
+Authorization: Bearer {{workflowToken}}
+Content-Type: application/json
+
+{
+  "title": "Workflow Test Task",
+  "description": "Testing complete workflow",
+  "column": "todo",
+  "priority": "high"
+}
+
+@workflowTaskId = {{workflowTask.response.body.task._id}}
+
+### Step 4: Move task to in-progress
+PUT {{baseUrl}}/tasks/{{workflowTaskId}}/move
+Authorization: Bearer {{workflowToken}}
+Content-Type: application/json
+
+{
+  "column": "in-progress",
+  "order": 0
+}
+
+### Step 5: Add comment to task
+POST {{baseUrl}}/tasks/{{workflowTaskId}}/comments
+Authorization: Bearer {{workflowToken}}
+Content-Type: application/json
+
+{
+  "text": "Working on this task now!"
+}
+
+### Step 6: Move task to done
+PUT {{baseUrl}}/tasks/{{workflowTaskId}}/move
+Authorization: Bearer {{workflowToken}}
+Content-Type: application/json
+
+{
+  "column": "done",
+  "order": 0
+}
+
+### Step 7: Verify project has updated tasks
+GET {{baseUrl}}/projects/{{workflowProjectId}}/tasks
+Authorization: Bearer {{workflowToken}}
+
+### Step 8: Logout
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{workflowToken}}
+
+###############################################
+### 📊 PERFORMANCE & LOAD TESTING
+###############################################
+
+### Create Multiple Tasks (Run multiple times)
+POST {{baseUrl}}/projects/{{newProjectId}}/tasks
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "title": "Load Test Task {{$randomInt}}",
+  "description": "Performance testing task",
+  "column": "todo",
+  "priority": "medium"
+}
+
+### Get All Tasks (Test response time)
+GET {{baseUrl}}/projects/{{newProjectId}}/tasks
+Authorization: Bearer {{authToken}}
+
+###
+### END OF API TESTS
+###
