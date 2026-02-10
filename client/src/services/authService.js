@@ -8,11 +8,15 @@ const authService = {
    */
   register: async (userData) => {
     const response = await api.post('/auth/register', userData);
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+    // Backend returns { success, data: { user, token } }
+    const result = response.data;
+    const token = result.data?.token || result.token;
+    const user = result.data?.user || result.user;
+    if (token) {
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
     }
-    return response.data;
+    return { ...result, user, token };
   },
 
   /**
@@ -22,11 +26,15 @@ const authService = {
    */
   login: async (credentials) => {
     const response = await api.post('/auth/login', credentials);
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+    // Backend returns { success, data: { user, token } }
+    const result = response.data;
+    const token = result.data?.token || result.token;
+    const user = result.data?.user || result.user;
+    if (token) {
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
     }
-    return response.data;
+    return { ...result, user, token };
   },
 
   /**
@@ -43,7 +51,9 @@ const authService = {
    */
   getMe: async () => {
     const response = await api.get('/auth/me');
-    return response.data;
+    // Backend returns { success, data: userProfile }
+    const result = response.data;
+    return { ...result, user: result.data || result.user };
   },
 
   /**
@@ -53,10 +63,13 @@ const authService = {
    */
   updateProfile: async (updates) => {
     const response = await api.put('/auth/profile', updates);
-    if (response.data.user) {
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+    // Backend returns { success, data: userProfile }
+    const result = response.data;
+    const user = result.data || result.user;
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
     }
-    return response.data;
+    return { ...result, user };
   },
 
   /**

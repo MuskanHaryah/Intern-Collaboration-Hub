@@ -23,10 +23,15 @@ const useAuthStore = create(
             set({ user, token, isAuthenticated: true });
             console.log('✅ [authStore] Auth initialized with existing session');
           } else {
-            console.log('ℹ️ [authStore] No existing session');
+            // No valid token/user — ensure we're fully logged out
+            set({ user: null, token: null, isAuthenticated: false });
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            console.log('ℹ️ [authStore] No existing session, cleared stale state');
           }
         } catch (error) {
           console.error('❌ [authStore] Error during initialization:', error);
+          set({ user: null, token: null, isAuthenticated: false });
         }
       },
 
@@ -69,6 +74,7 @@ const useAuthStore = create(
       // Logout user
       logout: () => {
         authService.logout();
+        localStorage.removeItem('auth-storage');
         set({
           user: null,
           token: null,

@@ -41,9 +41,10 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       
-      // Clear token and redirect to login
+      // Clear all auth data including Zustand persisted state
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      localStorage.removeItem('auth-storage');
       
       // Only redirect if not already on login page
       if (window.location.pathname !== '/login') {
