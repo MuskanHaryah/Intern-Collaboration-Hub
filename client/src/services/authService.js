@@ -106,6 +106,34 @@ const authService = {
   getToken: () => {
     return localStorage.getItem('token');
   },
+
+  /**
+   * Request password reset email
+   * @param {string} email
+   * @returns {Promise} - { success, message }
+   */
+  forgotPassword: async (email) => {
+    const response = await api.post('/auth/forgot-password', { email });
+    return response.data;
+  },
+
+  /**
+   * Reset password using token
+   * @param {string} token - Reset token from email link
+   * @param {string} password - New password
+   * @returns {Promise} - { success, message, data: { user, token } }
+   */
+  resetPassword: async (token, password) => {
+    const response = await api.put(`/auth/reset-password/${token}`, { password });
+    const result = response.data;
+    const jwtToken = result.data?.token || result.token;
+    const user = result.data?.user || result.user;
+    if (jwtToken) {
+      localStorage.setItem('token', jwtToken);
+      localStorage.setItem('user', JSON.stringify(user));
+    }
+    return { ...result, user, token: jwtToken };
+  },
 };
 
 export default authService;

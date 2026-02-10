@@ -5,6 +5,10 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ProjectPage from './pages/ProjectPage';
+import TermsPage from './pages/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import { CursorGlow } from './components/UI/CursorGlow';
 import { ErrorBoundary, AsyncHandlers } from './components/UI';
 import { ToastContainer } from './components/UI/RealtimeToast';
@@ -41,6 +45,10 @@ function App() {
           <AsyncHandlers.NetworkStatusMonitor />
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             <Route
               path="/login"
               element={
