@@ -153,9 +153,10 @@ export default function TasksPage() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className={`px-4 py-3 rounded-xl border focus:outline-none focus:border-purple-500 ${
+              className={`px-4 py-3 pr-10 rounded-xl border appearance-none cursor-pointer focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 bg-no-repeat bg-[length:16px_16px] bg-[position:right_12px_center] ${
                 isDark ? 'bg-[#12121a] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'
               }`}
+              style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
             >
               <option value="all">All Status</option>
               <option value="backlog">Backlog</option>
@@ -167,9 +168,10 @@ export default function TasksPage() {
             <select
               value={filterPriority}
               onChange={(e) => setFilterPriority(e.target.value)}
-              className={`px-4 py-3 rounded-xl border focus:outline-none focus:border-purple-500 ${
+              className={`px-4 py-3 pr-10 rounded-xl border appearance-none cursor-pointer focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 bg-no-repeat bg-[length:16px_16px] bg-[position:right_12px_center] ${
                 isDark ? 'bg-[#12121a] border-white/10 text-white' : 'bg-white border-gray-200 text-gray-900'
               }`}
+              style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
             >
               <option value="all">All Priority</option>
               <option value="low">Low</option>

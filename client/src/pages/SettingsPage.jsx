@@ -9,7 +9,6 @@ export default function SettingsPage() {
   const theme = useThemeStore((s) => s.theme);
   const isDark = theme === 'dark';
   const user = useAuthStore((s) => s.user);
-  const setUser = useAuthStore((s) => s.setUser);
 
   const [activeTab, setActiveTab] = useState('profile');
 
@@ -43,7 +42,7 @@ export default function SettingsPage() {
       const res = await api.put('/auth/profile', profileData);
       const updated = res.data?.data?.user || res.data?.data || res.data;
       if (updated?.name) {
-        setUser(updated);
+        useAuthStore.setState({ user: updated });
         localStorage.setItem('user', JSON.stringify(updated));
       }
       setProfileSuccess('Profile updated successfully!');

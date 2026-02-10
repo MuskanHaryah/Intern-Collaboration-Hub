@@ -104,14 +104,13 @@ export default function DashboardPage() {
     fetchDashboardData(); // Refresh data after creating project
   };
 
-  const getPriorityColor = (priority) => {
-    const colors = {
-      low: 'bg-gray-500',
-      medium: 'bg-yellow-500',
-      high: 'bg-orange-500',
-      urgent: 'bg-red-500',
-    };
-    return colors[priority] || 'bg-gray-500';
+  const getPriorityIcon = (priority) => {
+    const colors = { low: 'text-gray-400', medium: 'text-yellow-500', high: 'text-orange-500', urgent: 'text-red-500' };
+    return (
+      <svg className={`w-4 h-4 ${colors[priority] || colors.medium}`} fill="currentColor" viewBox="0 0 24 24">
+        <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z" />
+      </svg>
+    );
   };
 
   const getStatusBadge = (status) => {
@@ -219,11 +218,10 @@ export default function DashboardPage() {
                       : 'bg-white border-gray-200 hover:border-purple-200 shadow-sm hover:shadow-md'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="mb-4">
                     <div className={`w-12 h-12 rounded-xl ${stat.bgColor} flex items-center justify-center ${stat.iconColor}`}>
                       {stat.icon}
                     </div>
-                    <div className={`h-8 w-16 rounded-lg bg-gradient-to-r ${stat.gradient} opacity-20`} />
                   </div>
                   <p className={`text-3xl font-bold mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{stat.value}</p>
                   <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{stat.label}</p>
@@ -275,22 +273,24 @@ export default function DashboardPage() {
               >
                 <Link
                   to={`/projects/${project.id}`}
-                  className={`block rounded-2xl p-6 transition-all group border ${
+                  className={`block rounded-2xl overflow-hidden transition-all group border ${
                     isDark 
                       ? 'bg-[#12121a] border-white/10 hover:border-purple-500/50' 
                       : 'bg-white border-gray-200 hover:border-purple-300 shadow-sm'
                   }`}
                 >
+                  {/* Color Strip */}
+                  <div className="h-1" style={{ backgroundColor: project.color }} />
+
                   {/* Project Header */}
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start justify-between mb-4 px-6 pt-5">
                     <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg"
-                      style={{ backgroundColor: project.color + '30' }}
+                      className="w-11 h-11 rounded-xl flex items-center justify-center"
+                      style={{ backgroundColor: project.color + '20' }}
                     >
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: project.color }}
-                      ></div>
+                      <svg className="w-5 h-5" style={{ color: project.color }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                      </svg>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadge(project.status)}`}>
                       {project.status}
@@ -298,11 +298,12 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Project Info */}
-                  <h3 className={`text-lg font-semibold mb-2 group-hover:text-purple-400 transition-colors ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  <div className="px-6">
+                  <h3 className={`text-lg font-semibold mb-1.5 group-hover:text-purple-400 transition-colors ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {project.name}
                   </h3>
-                  <p className={`text-sm mb-4 line-clamp-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {project.description}
+                  <p className={`text-sm mb-4 line-clamp-2 min-h-[40px] ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {project.description || 'No description'}
                   </p>
 
                   {/* Progress Bar */}
@@ -310,32 +311,40 @@ export default function DashboardPage() {
                     <div className="flex items-center justify-between text-sm mb-2">
                       <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Progress</span>
                       <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                        {Math.round((project.completedTasks / project.taskCount) * 100)}%
+                        {project.taskCount > 0 ? Math.round((project.completedTasks / project.taskCount) * 100) : 0}%
                       </span>
                     </div>
                     <div className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
                       <div
-                        className="h-full rounded-full transition-all"
+                        className="h-full rounded-full transition-all bg-blue-400"
                         style={{
-                          width: `${(project.completedTasks / project.taskCount) * 100}%`,
-                          backgroundColor: project.color,
+                          width: `${project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0}%`,
                         }}
                       ></div>
                     </div>
                   </div>
 
                   {/* Footer */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${getPriorityColor(project.priority)}`}></div>
-                      <span className={`text-sm capitalize ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{project.priority}</span>
+                  <div className="flex items-center justify-between pb-6">
+                    <div className="flex items-center gap-1.5">
+                      {getPriorityIcon(project.priority)}
+                      <span className={`text-xs capitalize ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{project.priority}</span>
                     </div>
-                    <div className={`flex items-center gap-2 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                      </svg>
-                      {project.memberCount}
+                    <div className="flex items-center gap-3">
+                      <div className={`flex items-center gap-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        {project.taskCount}
+                      </div>
+                      <div className={`flex items-center gap-1 text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        {project.memberCount}
+                      </div>
                     </div>
+                  </div>
                   </div>
                 </Link>
               </motion.div>

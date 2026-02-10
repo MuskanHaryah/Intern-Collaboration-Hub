@@ -139,22 +139,23 @@ export default function ProjectsPage() {
                 }`}
               />
             </div>
-            <div className="flex gap-2">
-              {['all', 'planning', 'active', 'on-hold', 'completed'].map((status) => (
-                <button
-                  key={status}
-                  onClick={() => setFilterStatus(status)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-all ${
-                    filterStatus === status
-                      ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/25'
-                      : isDark
-                        ? 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
-                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
-                  }`}
-                >
-                  {status === 'all' ? 'All' : status}
-                </button>
-              ))}
+            <div className="flex gap-4">
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className={`px-4 py-3 pr-10 rounded-xl border appearance-none cursor-pointer focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 bg-no-repeat bg-[length:16px_16px] bg-[position:right_12px_center] ${
+                  isDark
+                    ? 'bg-[#12121a] border-white/10 text-white'
+                    : 'bg-white border-gray-200 text-gray-900'
+                }`}
+                style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")` }}
+              >
+                <option value="all">All Status</option>
+                <option value="planning">Planning</option>
+                <option value="active">Active</option>
+                <option value="on-hold">On-Hold</option>
+                <option value="completed">Completed</option>
+              </select>
             </div>
           </div>
 
@@ -195,16 +196,16 @@ export default function ProjectsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <div className={`rounded-2xl p-6 transition-all group border relative ${
+                  <div className={`rounded-2xl overflow-hidden transition-all group border relative ${
                     isDark
                       ? 'bg-[#12121a] border-white/10 hover:border-purple-500/30'
                       : 'bg-white border-gray-200 hover:border-purple-200 shadow-sm hover:shadow-md'
                   }`}>
                     {/* Color strip */}
-                    <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl" style={{ backgroundColor: project.color }} />
+                    <div className="h-1" style={{ backgroundColor: project.color }} />
 
                     {/* Header */}
-                    <div className="flex items-start justify-between mb-4 mt-1">
+                    <div className="flex items-start justify-between mb-4 mt-1 px-6 pt-5">
                       <div
                         className="w-11 h-11 rounded-xl flex items-center justify-center"
                         style={{ backgroundColor: project.color + '20' }}
@@ -231,17 +232,17 @@ export default function ProjectsPage() {
                     </div>
 
                     {/* Project Info */}
-                    <Link to={`/projects/${project.id}`} className="block">
+                    <Link to={`/projects/${project.id}`} className="block px-6">
                       <h3 className={`text-lg font-semibold mb-1.5 group-hover:text-purple-400 transition-colors ${isDark ? 'text-white' : 'text-gray-900'}`}>
                         {project.name}
                       </h3>
-                      <p className={`text-sm mb-4 line-clamp-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                      <p className={`text-sm mb-4 line-clamp-2 min-h-[40px] ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                         {project.description || 'No description'}
                       </p>
                     </Link>
 
                     {/* Progress */}
-                    <div className="mb-4">
+                    <div className="mb-4 px-6">
                       <div className="flex items-center justify-between text-sm mb-1.5">
                         <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Progress</span>
                         <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -250,17 +251,16 @@ export default function ProjectsPage() {
                       </div>
                       <div className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
                         <div
-                          className="h-full rounded-full transition-all"
+                          className="h-full rounded-full transition-all bg-blue-400"
                           style={{
                             width: `${project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0}%`,
-                            backgroundColor: project.color,
                           }}
                         />
                       </div>
                     </div>
 
                     {/* Footer */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between px-6 pb-6">
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1.5">
                           {getPriorityIcon(project.priority)}
