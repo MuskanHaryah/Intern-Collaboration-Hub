@@ -9,11 +9,12 @@ export default function ThemeToggle({ className = '' }) {
   return (
     <motion.button
       onClick={toggleTheme}
-      className={`relative w-16 h-8 rounded-full p-1 transition-colors duration-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 ${
+      className={`relative w-16 h-8 rounded-full p-1 transition-all duration-500 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/50 ${
         isDark 
-          ? 'bg-gradient-to-r from-indigo-900 to-purple-900 border border-purple-500/30' 
-          : 'bg-gradient-to-r from-amber-200 to-orange-300 border border-amber-400/50'
+          ? 'bg-gradient-to-r from-indigo-900 to-purple-900 border-2 border-purple-400/50 shadow-lg shadow-purple-500/20 hover:border-purple-400/80 hover:shadow-purple-500/40' 
+          : 'bg-gradient-to-r from-amber-200 to-orange-300 border-2 border-amber-500/60 shadow-lg shadow-amber-500/20 hover:border-amber-500/90 hover:shadow-amber-500/40'
       } ${className}`}
+      whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
     >

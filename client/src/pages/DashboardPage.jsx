@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import ThemeToggle from '../components/UI/ThemeToggle';
+import DashboardLayout from '../components/Layout/DashboardLayout';
 import useThemeStore from '../stores/themeStore';
 import useAuthStore from '../stores/authStore';
 import { projectService, taskService } from '../services';
@@ -125,122 +125,23 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${isDark ? 'bg-[#0a0a0f]' : 'bg-[#f0f2f5]'}`}>
-      {/* Sidebar */}
-      <aside className={`fixed left-0 top-0 h-full w-64 border-r p-4 z-40 transition-colors duration-500 ${
-        isDark ? 'bg-[#12121a] border-white/10' : 'bg-white border-gray-200'
-      }`}>
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg">
-            C
-          </div>
-          <span className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>CollabHub</span>
-        </Link>
-
-        {/* Navigation */}
-        <nav className="space-y-2">
-          <Link
-            to="/dashboard"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl ${
-              isDark 
-                ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' 
-                : 'bg-purple-50 text-purple-600 border border-purple-200'
-            }`}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
-            Dashboard
-          </Link>
-
-          <Link
-            to="/projects"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-              isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
-            }`}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-            </svg>
-            Projects
-          </Link>
-
-          <Link
-            to="/tasks"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-              isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
-            }`}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-            </svg>
-            My Tasks
-          </Link>
-
-          <Link
-            to="/team"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-              isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
-            }`}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            Team
-          </Link>
-        </nav>
-
-        {/* User Profile */}
-        <div className="absolute bottom-4 left-4 right-4">
-          <div className={`flex items-center gap-3 p-3 rounded-xl border transition-colors duration-500 ${
-            isDark ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'
-          }`}>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold">
-              {user?.name?.charAt(0).toUpperCase() || 'U'}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className={`text-sm font-medium truncate ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                {user?.name || 'User Name'}
-              </p>
-              <p className={`text-xs truncate ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                {user?.email || 'user@example.com'}
-              </p>
-            </div>
-            <button className={`p-2 transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-400 hover:text-gray-700'}`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="ml-64 p-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className={`text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Dashboard</h1>
-            <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>Welcome back! Here's what's happening with your projects.</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setShowNewProjectModal(true)}
-            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 transition-all"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            New Project
-          </motion.button>
-          </div>
-        </div>
-
+    <DashboardLayout
+      title="Dashboard"
+      subtitle={`Welcome back, ${user?.name?.split(' ')[0] || 'there'}! Here's what's happening with your projects.`}
+      headerActions={
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => setShowNewProjectModal(true)}
+          className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 transition-all"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          New Project
+        </motion.button>
+      }
+    >
         {/* Loading State */}
         {loading && <LoadingStates.LoadingOverlay fullScreen message="Loading your dashboard..." />}
 
@@ -258,27 +159,71 @@ export default function DashboardPage() {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {[
-                { label: 'Total Projects', value: stats.totalProjects, icon: '📁', color: 'purple' },
-                { label: 'Active Tasks', value: stats.activeTasks, icon: '📋', color: 'pink' },
-                { label: 'Completed', value: stats.completedTasks, icon: '✅', color: 'green' },
-                { label: 'Team Members', value: stats.teamMembers, icon: '👥', color: 'blue' },
+                {
+                  label: 'Total Projects',
+                  value: stats.totalProjects,
+                  icon: (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                    </svg>
+                  ),
+                  gradient: 'from-purple-500 to-indigo-500',
+                  bgColor: isDark ? 'bg-purple-500/10' : 'bg-purple-50',
+                  iconColor: 'text-purple-500',
+                },
+                {
+                  label: 'Active Tasks',
+                  value: stats.activeTasks,
+                  icon: (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  ),
+                  gradient: 'from-pink-500 to-rose-500',
+                  bgColor: isDark ? 'bg-pink-500/10' : 'bg-pink-50',
+                  iconColor: 'text-pink-500',
+                },
+                {
+                  label: 'Completed',
+                  value: stats.completedTasks,
+                  icon: (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  ),
+                  gradient: 'from-emerald-500 to-green-500',
+                  bgColor: isDark ? 'bg-emerald-500/10' : 'bg-emerald-50',
+                  iconColor: 'text-emerald-500',
+                },
+                {
+                  label: 'Team Members',
+                  value: stats.teamMembers,
+                  icon: (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  ),
+                  gradient: 'from-blue-500 to-cyan-500',
+                  bgColor: isDark ? 'bg-blue-500/10' : 'bg-blue-50',
+                  iconColor: 'text-blue-500',
+                },
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={`rounded-2xl p-6 transition-all duration-500 border ${
+                  className={`rounded-2xl p-6 transition-all duration-300 border group hover:scale-[1.02] ${
                     isDark 
-                      ? 'bg-[#12121a] border-white/10 hover:border-purple-500/50' 
-                      : 'bg-white border-gray-200 hover:border-purple-300 shadow-sm'
+                      ? 'bg-[#12121a] border-white/10 hover:border-purple-500/30' 
+                      : 'bg-white border-gray-200 hover:border-purple-200 shadow-sm hover:shadow-md'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-3xl">{stat.icon}</span>
-                    <div className={`w-12 h-12 rounded-xl bg-${stat.color}-500/20 flex items-center justify-center`}>
-                      <div className={`w-3 h-3 rounded-full bg-${stat.color}-500`}></div>
+                    <div className={`w-12 h-12 rounded-xl ${stat.bgColor} flex items-center justify-center ${stat.iconColor}`}>
+                      {stat.icon}
                     </div>
+                    <div className={`h-8 w-16 rounded-lg bg-gradient-to-r ${stat.gradient} opacity-20`} />
                   </div>
                   <p className={`text-3xl font-bold mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{stat.value}</p>
                   <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{stat.label}</p>
@@ -405,39 +350,68 @@ export default function DashboardPage() {
           <div className={`rounded-2xl p-6 border transition-colors duration-500 ${
             isDark ? 'bg-[#12121a] border-white/10' : 'bg-white border-gray-200 shadow-sm'
           }`}>
-            <div className="space-y-4">
-              {[
-                { user: 'John Doe', action: 'completed task', target: 'Setup database', time: '2 minutes ago', color: 'green' },
-                { user: 'Jane Smith', action: 'added comment on', target: 'API Integration', time: '15 minutes ago', color: 'blue' },
-                { user: 'Mike Johnson', action: 'moved task to', target: 'In Progress', time: '1 hour ago', color: 'yellow' },
-                { user: 'Sarah Wilson', action: 'created task', target: 'User authentication', time: '2 hours ago', color: 'purple' },
-              ].map((activity, index) => (
-                <div key={index} className={`flex items-center gap-4 py-3 border-b last:border-0 ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
-                  <div className={`w-10 h-10 rounded-full bg-${activity.color}-500/20 flex items-center justify-center text-${activity.color}-400 font-semibold`}>
-                    {activity.user.charAt(0)}
+            {projects.length === 0 ? (
+              <div className={`text-center py-8 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                <svg className="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p>No recent activity yet. Create a project to get started!</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {projects.slice(0, 4).map((project, index) => (
+                  <div key={index} className={`flex items-center gap-4 py-3 border-b last:border-0 ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: project.color + '20' }}
+                    >
+                      <svg className="w-5 h-5" style={{ color: project.color }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={isDark ? 'text-white' : 'text-gray-900'}>
+                        <Link to={`/projects/${project.id}`} className="font-medium hover:text-purple-400 transition-colors">
+                          {project.name}
+                        </Link>
+                        <span className={`ml-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                          — {project.taskCount} tasks, {project.completedTasks} done
+                        </span>
+                      </p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className={`text-xs px-2 py-0.5 rounded-full border ${getStatusBadge(project.status)}`}>
+                          {project.status}
+                        </span>
+                        <span className={`text-xs flex items-center gap-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                          </svg>
+                          {project.memberCount} members
+                        </span>
+                      </div>
+                    </div>
+                    <Link
+                      to={`/projects/${project.id}`}
+                      className={`p-2 rounded-lg transition-colors ${isDark ? 'hover:bg-white/5 text-gray-400 hover:text-white' : 'hover:bg-gray-100 text-gray-400 hover:text-gray-700'}`}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
                   </div>
-                  <div className="flex-1">
-                    <p className={isDark ? 'text-white' : 'text-gray-900'}>
-                      <span className="font-medium">{activity.user}</span>{' '}
-                      <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>{activity.action}</span>{' '}
-                      <span className="text-purple-400">{activity.target}</span>
-                    </p>
-                    <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{activity.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         </>
         )}
-      </main>
 
       {/* New Project Modal */}
       {showNewProjectModal && (
         <NewProjectModal onClose={() => setShowNewProjectModal(false)} onSuccess={handleProjectCreated} />
       )}
-    </div>
+    </DashboardLayout>
   );
 }
 
