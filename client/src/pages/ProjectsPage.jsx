@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import DashboardLayout from '../components/Layout/DashboardLayout';
 import useThemeStore from '../stores/themeStore';
 import { projectService, taskService } from '../services';
-import { LoadingStates, ErrorStates } from '../components/UI';
+import { LoadingStates, ErrorStates, ConfirmationModal } from '../components/UI';
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
@@ -13,6 +13,7 @@ export default function ProjectsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState({ open: false, projectId: null, projectName: '' });
 
   const theme = useThemeStore((s) => s.theme);
   const isDark = theme === 'dark';
@@ -64,9 +65,9 @@ export default function ProjectsPage() {
   };
 
   const handleDelete = async (projectId) => {
-    if (!window.confirm('Are you sure you want to delete this project?')) return;
     try {
       await projectService.delete(projectId);
+      setDeleteConfirm({ open: false, projectId: null, projectName: '' });
       fetchProjects();
     } catch (err) {
       alert(err.message || 'Failed to delete project');
@@ -219,7 +220,7 @@ export default function ProjectsPage() {
                           {project.status}
                         </span>
                         <button
-                          onClick={() => handleDelete(project.id)}
+                          onClick={() => setDeleteConfirm({ open: true, projectId: project.id, projectName: project.name })}
                           className={`p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all ${
                             isDark ? 'hover:bg-red-500/10 text-gray-500 hover:text-red-400' : 'hover:bg-red-50 text-gray-400 hover:text-red-500'
                           }`}
@@ -297,6 +298,17 @@ export default function ProjectsPage() {
           onSuccess={() => { setShowNewProjectModal(false); fetchProjects(); }}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={deleteConfirm.open}
+        onClose={() => setDeleteConfirm({ open: false, projectId: null, projectName: '' })}
+        onConfirm={() => handleDelete(deleteConfirm.projectId)}
+        title="Delete Project"
+        message={`Are you sure you want to delete "${deleteConfirm.projectName}"? All tasks and data in this project will be permanently removed.`}
+        confirmText="Delete Project"
+        variant="danger"
+      />
     </DashboardLayout>
   );
 }

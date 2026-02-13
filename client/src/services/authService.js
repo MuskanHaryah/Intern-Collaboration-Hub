@@ -21,18 +21,26 @@ const authService = {
 
   /**
    * Login user
-   * @param {Object} credentials - { email, password }
+   * @param {Object} credentials - { email, password, rememberMe }
    * @returns {Promise} - { success, token, user }
    */
   login: async (credentials) => {
+    const { rememberMe, ...loginData } = credentials;
     const response = await api.post('/auth/login', credentials);
     // Backend returns { success, data: { user, token } }
     const result = response.data;
     const token = result.data?.token || result.token;
     const user = result.data?.user || result.user;
     if (token) {
+      // Store in localStorage (persist) or sessionStorage (session only)
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem('token', token);
+      storage.setItem('user', JSON.stringify(user));
+      // Also always set in localStorage for API interceptor compatibility
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
+      // Save the rememberMe preference
+      localStorage.setItem('rememberMe', rememberMe ? 'true' : 'false');
     }
     return { ...result, user, token };
   },
@@ -43,6 +51,9 @@ const authService = {
   logout: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('rememberMe');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
   },
 
   /**

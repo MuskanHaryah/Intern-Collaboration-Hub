@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { KanbanBoard } from '../components/Kanban';
 import { MilestoneList, MilestoneProgress } from '../components/Milestones';
 import { useSocket } from '../socket';
-import { OnlineUsers, LoadingStates, ErrorStates } from '../components/UI';
+import { OnlineUsers, LoadingStates, ErrorStates, ConfirmationModal } from '../components/UI';
 import { projectService, taskService } from '../services';
 
 export default function ProjectPage() {
@@ -13,6 +13,8 @@ export default function ProjectPage() {
   const [milestones, setMilestones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deleteTaskConfirm, setDeleteTaskConfirm] = useState({ open: false, taskId: null });
+  const [deleteMilestoneConfirm, setDeleteMilestoneConfirm] = useState({ open: false, milestoneId: null });
   const [viewMode, setViewMode] = useState('board'); // board, list, timeline
   const [showMilestones, setShowMilestones] = useState(true);
   const { joinProjectRoom, leaveProjectRoom, onlineUsers, isConnected } = useSocket();
@@ -189,9 +191,14 @@ export default function ProjectPage() {
       if (response.success) {
         setTasks(tasks.filter((t) => t.id !== taskId));
       }
+      setDeleteTaskConfirm({ open: false, taskId: null });
     } catch (err) {
       console.error('Error deleting task:', err);
     }
+  };
+
+  const requestDeleteTask = (taskId) => {
+    setDeleteTaskConfirm({ open: true, taskId });
   };
 
   const handleMoveTask = async (taskId, newColumn, newOrder) => {
@@ -263,9 +270,14 @@ export default function ProjectPage() {
       if (response.success) {
         setMilestones(milestones.filter((m) => m.id !== milestoneId && m._id !== milestoneId));
       }
+      setDeleteMilestoneConfirm({ open: false, milestoneId: null });
     } catch (err) {
       console.error('Error deleting milestone:', err);
     }
+  };
+
+  const requestDeleteMilestone = (milestoneId) => {
+    setDeleteMilestoneConfirm({ open: true, milestoneId });
   };
 
   const handleToggleMilestone = async (milestoneId, completed) => {
@@ -498,7 +510,7 @@ export default function ProjectPage() {
             tasks={tasks}
             onAddTask={handleAddTask}
             onUpdateTask={handleUpdateTask}
-            onDeleteTask={handleDeleteTask}
+            onDeleteTask={requestDeleteTask}
             onMoveTask={handleMoveTask}
             projectMembers={project.members}
           />
@@ -513,12 +525,34 @@ export default function ProjectPage() {
               projectId={projectId}
               onAddMilestone={handleAddMilestone}
               onUpdateMilestone={handleUpdateMilestone}
-              onDeleteMilestone={handleDeleteMilestone}
+              onDeleteMilestone={requestDeleteMilestone}
               onToggleMilestone={handleToggleMilestone}
             />
           </div>
         )}
       </main>
+
+      {/* Delete Task Confirmation */}
+      <ConfirmationModal
+        isOpen={deleteTaskConfirm.open}
+        onClose={() => setDeleteTaskConfirm({ open: false, taskId: null })}
+        onConfirm={() => handleDeleteTask(deleteTaskConfirm.taskId)}
+        title="Delete Task"
+        message="Are you sure you want to delete this task? This action cannot be undone."
+        confirmText="Delete Task"
+        variant="danger"
+      />
+
+      {/* Delete Milestone Confirmation */}
+      <ConfirmationModal
+        isOpen={deleteMilestoneConfirm.open}
+        onClose={() => setDeleteMilestoneConfirm({ open: false, milestoneId: null })}
+        onConfirm={() => handleDeleteMilestone(deleteMilestoneConfirm.milestoneId)}
+        title="Delete Milestone"
+        message="Are you sure you want to delete this milestone? This action cannot be undone."
+        confirmText="Delete Milestone"
+        variant="danger"
+      />
     </div>
   );
 }

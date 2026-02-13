@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '../UI/ThemeToggle';
+import ConfirmationModal from '../UI/ConfirmationModal';
 import useThemeStore from '../../stores/themeStore';
 import useAuthStore from '../../stores/authStore';
 
@@ -62,8 +63,11 @@ export default function DashboardLayout({ children, title, subtitle, headerActio
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const handleLogout = () => {
+    setShowLogoutConfirm(false);
+    setShowUserMenu(false);
     logout();
     navigate('/login');
   };
@@ -160,7 +164,7 @@ export default function DashboardLayout({ children, title, subtitle, headerActio
                     My Profile
                   </Link>
                   <button
-                    onClick={handleLogout}
+                    onClick={() => { setShowUserMenu(false); setShowLogoutConfirm(true); }}
                     className={`w-full flex items-center gap-3 px-4 py-3 transition-colors border-t ${
                       isDark ? 'text-red-400 hover:bg-red-500/10 border-white/10' : 'text-red-500 hover:bg-red-50 border-gray-100'
                     }`}
@@ -177,13 +181,39 @@ export default function DashboardLayout({ children, title, subtitle, headerActio
         </div>
       </aside>
 
+      {/* Sign Out Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleLogout}
+        title="Sign Out"
+        message="Are you sure you want to sign out? You'll need to log in again to access your projects."
+        confirmText="Sign Out"
+        variant="warning"
+      />
+
       {/* Main Content */}
       <main className="ml-64 p-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className={`text-3xl font-bold mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{title}</h1>
-            {subtitle && <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>{subtitle}</p>}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className={`p-2 rounded-xl transition-all ${
+                isDark
+                  ? 'hover:bg-white/10 text-gray-400 hover:text-white'
+                  : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'
+              }`}
+              title="Go back"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </button>
+            <div>
+              <h1 className={`text-3xl font-bold mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{title}</h1>
+              {subtitle && <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>{subtitle}</p>}
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />

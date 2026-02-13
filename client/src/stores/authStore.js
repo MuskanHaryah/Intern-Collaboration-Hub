@@ -11,17 +11,26 @@ const useAuthStore = create(
       isLoading: false,
       error: null,
 
-      // Initialize auth state from localStorage
+      // Initialize auth state - syncs localStorage token with persisted state
       initialize: () => {
         console.log('🔐 [authStore] Initializing auth state...');
         try {
+          const state = get();
+          // If zustand persist has rehydrated valid state, sync token to localStorage
+          if (state.token && state.user && state.isAuthenticated) {
+            localStorage.setItem('token', state.token);
+            localStorage.setItem('user', JSON.stringify(state.user));
+            console.log('✅ [authStore] Auth initialized from persisted state');
+            return;
+          }
+          // Fallback: check localStorage directly
           const token = localStorage.getItem('token');
           const user = authService.getStoredUser();
           console.log('🔐 [authStore] Token:', token ? 'Present' : 'None');
           console.log('🔐 [authStore] User:', user ? user.email : 'None');
           if (token && user) {
             set({ user, token, isAuthenticated: true });
-            console.log('✅ [authStore] Auth initialized with existing session');
+            console.log('✅ [authStore] Auth initialized from localStorage');
           } else {
             // No valid token/user — ensure we're fully logged out
             set({ user: null, token: null, isAuthenticated: false });

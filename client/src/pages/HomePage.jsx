@@ -2,12 +2,15 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ThemeToggle from '../components/UI/ThemeToggle';
 import useThemeStore from '../stores/themeStore';
+import useAuthStore from '../stores/authStore';
 
 console.log('📄 [HomePage.jsx] HomePage component loaded');
 
 export default function HomePage() {
   console.log('🏠 [HomePage.jsx] HomePage rendering...');
   const theme = useThemeStore((s) => s.theme);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const user = useAuthStore((s) => s.user);
   console.log('🎨 [HomePage.jsx] Current theme:', theme);
   const isDark = theme === 'dark';
 
@@ -62,16 +65,24 @@ export default function HomePage() {
 
         <div className="flex items-center gap-4">
           <ThemeToggle />
-          <Link to="/login" className={`px-5 py-2 rounded-full transition-all hidden sm:block ${
-            isDark 
-              ? 'text-white border border-white/20 hover:bg-white/10' 
-              : 'text-gray-700 border border-gray-300 hover:bg-gray-100'
-          }`}>
-            Login
-          </Link>
-          <Link to="/register" className="px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all">
-            Get Started
-          </Link>
+          {isAuthenticated ? (
+            <Link to="/dashboard" className="px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all">
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link to="/login" className={`px-5 py-2 rounded-full transition-all hidden sm:block ${
+                isDark 
+                  ? 'text-white border border-white/20 hover:bg-white/10' 
+                  : 'text-gray-700 border border-gray-300 hover:bg-gray-100'
+              }`}>
+                Login
+              </Link>
+              <Link to="/register" className="px-5 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all">
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -122,13 +133,13 @@ export default function HomePage() {
             className="flex flex-wrap gap-4"
           >
             <Link 
-              to="/register"
+              to={isAuthenticated ? "/dashboard" : "/register"}
               className="group relative px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full font-medium transition-all flex items-center gap-2 overflow-visible"
             >
               {/* Glow effect behind button */}
               <span className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 blur-xl opacity-50 group-hover:opacity-80 group-hover:blur-2xl transition-all duration-500 -z-10 scale-110" />
               <span className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600/60 to-pink-600/60 blur-2xl opacity-30 group-hover:opacity-60 transition-all duration-500 -z-20 scale-150" />
-              Start Collaborating
+              {isAuthenticated ? 'Go to Dashboard' : 'Start Collaborating'}
               <svg 
                 className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
                 fill="none" 
@@ -143,17 +154,6 @@ export default function HomePage() {
                 />
               </svg>
             </Link>
-            <button className={`group relative px-6 py-3 rounded-full font-medium transition-all flex items-center gap-2 ${
-              isDark 
-                ? 'border border-white/20 text-white hover:bg-white/10' 
-                : 'border border-gray-300 text-gray-700 hover:bg-gray-100'
-            }`}>
-              <svg className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Watch Demo
-            </button>
           </motion.div>
 
           {/* Stats */}
@@ -277,7 +277,7 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, delay: 0.8 }}
-              className="absolute top-32 left-32 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-pink-500/30 animate-pulse"
+              className="absolute top-32 left-1/2 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-pink-500/30 animate-pulse"
             >
               +5 Updates
             </motion.div>
@@ -313,7 +313,7 @@ export default function HomePage() {
               </defs>
               {/* Curved arrow from +5 Updates badge to API Integration card */}
               <motion.path
-                d="M 214 150 Q 150 250 90 350"
+                d="M 280 150 Q 200 260 100 360"
                 stroke="url(#lineGradient)"
                 strokeWidth="2.5"
                 fill="none"
@@ -324,7 +324,7 @@ export default function HomePage() {
               />
               {/* Secondary decorative curved line */}
               <motion.path
-                d="M 244 160 Q 320 200 380 280"
+                d="M 310 160 Q 370 210 400 290"
                 stroke="url(#lineGradient)"
                 strokeWidth="2"
                 fill="none"
