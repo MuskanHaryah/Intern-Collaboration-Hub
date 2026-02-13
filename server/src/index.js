@@ -12,6 +12,9 @@ import connectDB from './config/database.js';
 import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
 import taskRoutes from './routes/tasks.js';
+import userRoutes from './routes/users.js';
+import invitationRoutes from './routes/invitations.js';
+import notificationRoutes from './routes/notifications.js';
 import { setupSocketHandlers } from './socket/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -62,6 +65,9 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/invitations', invitationRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Setup Socket.IO handlers with authentication
 setupSocketHandlers(io);

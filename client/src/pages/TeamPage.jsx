@@ -5,12 +5,14 @@ import useThemeStore from '../stores/themeStore';
 import useAuthStore from '../stores/authStore';
 import { projectService } from '../services';
 import { LoadingStates, ErrorStates } from '../components/UI';
+import TeamInviteModal from '../components/UI/TeamInviteModal';
 
 export default function TeamPage() {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   const theme = useThemeStore((s) => s.theme);
   const isDark = theme === 'dark';
@@ -110,7 +112,22 @@ export default function TeamPage() {
   );
 
   return (
-    <DashboardLayout title="Team" subtitle={`${members.length} member${members.length !== 1 ? 's' : ''} across your projects`}>
+    <DashboardLayout
+      title="Team"
+      subtitle={`${members.length} member${members.length !== 1 ? 's' : ''} across your projects`}
+      headerActions={
+        <button
+          onClick={() => setInviteOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white text-sm font-medium rounded-xl transition-all shadow-lg shadow-purple-500/25"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+          </svg>
+          Invite Member
+        </button>
+      }
+    >
+      <TeamInviteModal isOpen={inviteOpen} onClose={() => setInviteOpen(false)} onInviteSent={fetchTeamMembers} />
       {loading && <LoadingStates.LoadingOverlay fullScreen message="Loading team..." />}
       {error && !loading && <ErrorStates.ErrorMessage message={error} onRetry={fetchTeamMembers} />}
 

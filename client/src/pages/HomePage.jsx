@@ -277,7 +277,7 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, delay: 0.8 }}
-              className="absolute top-32 left-1/2 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-pink-500/30 animate-pulse"
+              className="absolute top-[130px] left-1/2 -translate-x-1/2 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-pink-500/30 animate-pulse"
             >
               +5 Updates
             </motion.div>

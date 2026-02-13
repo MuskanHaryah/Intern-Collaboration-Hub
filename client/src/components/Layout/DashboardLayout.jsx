@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '../UI/ThemeToggle';
+import NotificationBell from '../UI/NotificationBell';
 import ConfirmationModal from '../UI/ConfirmationModal';
 import useThemeStore from '../../stores/themeStore';
 import useAuthStore from '../../stores/authStore';
@@ -198,13 +199,19 @@ export default function DashboardLayout({ children, title, subtitle, headerActio
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-start gap-3">
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => {
+                if (location.pathname === '/dashboard') {
+                  navigate('/');
+                } else {
+                  navigate(-1);
+                }
+              }}
               className={`p-2 mt-1 rounded-xl transition-all ${
                 isDark
                   ? 'hover:bg-white/10 text-gray-400 hover:text-white'
                   : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'
               }`}
-              title="Go back"
+              title={location.pathname === '/dashboard' ? 'Back to Home' : 'Go back'}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -216,6 +223,7 @@ export default function DashboardLayout({ children, title, subtitle, headerActio
             </div>
           </div>
           <div className="flex items-center gap-4">
+            <NotificationBell />
             <ThemeToggle />
             {headerActions}
           </div>
