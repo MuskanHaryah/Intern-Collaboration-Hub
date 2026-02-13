@@ -12,6 +12,15 @@
   box-sizing: border-box;
 }
 
+/* Hide browser native password reveal buttons */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-contacts-auto-fill-button,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  display: none !important;
+  pointer-events: none;
+}
+
 body {
   font-family: 'Inter', system-ui, sans-serif;
   background-color: #0a0a0f;

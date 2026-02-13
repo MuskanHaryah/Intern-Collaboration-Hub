@@ -124,17 +124,25 @@ projectSchema.methods.getSummary = function () {
 
 // Check if user is member or owner
 projectSchema.methods.isMember = function (userId) {
-  if (this.owner.toString() === userId.toString()) return true;
+  const ownerId = this.owner._id || this.owner;
+  if (ownerId.toString() === userId.toString()) return true;
   return this.members.some(
-    (member) => member.user.toString() === userId.toString()
+    (member) => {
+      const memberId = member.user._id || member.user;
+      return memberId.toString() === userId.toString();
+    }
   );
 };
 
 // Get user's role in project
 projectSchema.methods.getUserRole = function (userId) {
-  if (this.owner.toString() === userId.toString()) return 'owner';
+  const ownerId = this.owner._id || this.owner;
+  if (ownerId.toString() === userId.toString()) return 'owner';
   const member = this.members.find(
-    (m) => m.user.toString() === userId.toString()
+    (m) => {
+      const memberId = m.user._id || m.user;
+      return memberId.toString() === userId.toString();
+    }
   );
   return member ? member.role : null;
 };

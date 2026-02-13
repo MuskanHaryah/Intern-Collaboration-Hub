@@ -152,7 +152,7 @@ export default function DashboardLayout({ children, title, subtitle, headerActio
                   }`}
                 >
                   <Link
-                    to="/settings"
+                    to="/profile"
                     onClick={() => setShowUserMenu(false)}
                     className={`flex items-center gap-3 px-4 py-3 transition-colors ${
                       isDark ? 'text-gray-300 hover:bg-white/5' : 'text-gray-700 hover:bg-gray-50'
@@ -196,10 +196,10 @@ export default function DashboardLayout({ children, title, subtitle, headerActio
       <main className="ml-64 p-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
+          <div className="flex items-start gap-3">
             <button
               onClick={() => navigate(-1)}
-              className={`p-2 rounded-xl transition-all ${
+              className={`p-2 mt-1 rounded-xl transition-all ${
                 isDark
                   ? 'hover:bg-white/10 text-gray-400 hover:text-white'
                   : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'

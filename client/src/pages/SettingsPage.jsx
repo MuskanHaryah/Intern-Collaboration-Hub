@@ -4,6 +4,7 @@ import DashboardLayout from '../components/Layout/DashboardLayout';
 import useThemeStore from '../stores/themeStore';
 import useAuthStore from '../stores/authStore';
 import api from '../services/api';
+import { ConfirmationModal } from '../components/UI';
 
 export default function SettingsPage() {
   const theme = useThemeStore((s) => s.theme);
@@ -11,6 +12,7 @@ export default function SettingsPage() {
   const user = useAuthStore((s) => s.user);
 
   const [activeTab, setActiveTab] = useState('profile');
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   // Profile form
   const [profileData, setProfileData] = useState({
@@ -153,7 +155,7 @@ export default function SettingsPage() {
             {/* Danger Zone */}
             <div className={`mt-4 pt-4 border-t ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
               <button
-                onClick={handleLogout}
+                onClick={() => setShowLogoutConfirm(true)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
                   isDark ? 'text-red-400 hover:bg-red-500/10' : 'text-red-500 hover:bg-red-50'
                 }`}
@@ -418,6 +420,16 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleLogout}
+        title="Sign Out"
+        message="Are you sure you want to sign out? You'll need to log in again to access your projects."
+        confirmText="Sign Out"
+        variant="warning"
+      />
     </DashboardLayout>
   );
 }
