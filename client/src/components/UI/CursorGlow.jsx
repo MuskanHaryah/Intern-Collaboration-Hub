@@ -12,8 +12,8 @@ export function CursorGlow() {
       glow.style.left = e.clientX + 'px';
       glow.style.top = e.clientY + 'px';
 
-      const isRight = e.clientX > window.innerWidth * 0.45;
-      setIsNearRobot(isRight);
+      // Always show the glow (remove the conditional)
+      setIsNearRobot(true);
     };
 
     window.addEventListener('mousemove', moveCursor);

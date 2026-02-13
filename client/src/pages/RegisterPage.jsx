@@ -58,6 +58,26 @@ export default function RegisterPage() {
     <div className={`min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden transition-colors duration-500 ${
       isDark ? 'bg-[#0a0a0f]' : 'bg-[#f8f9fc]'
     }`}>
+      {/* Back to Home Button */}
+      <Link
+        to="/"
+        className={`absolute top-6 left-6 z-10 flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+          isDark 
+            ? 'bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10'
+            : 'bg-white hover:bg-gray-50 text-gray-600 hover:text-gray-900 border border-gray-200 shadow-sm'
+        }`}
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span className="text-sm font-medium">Home</span>
+      </Link>
+
+      {/* Theme Toggle */}
+      <div className="absolute top-6 right-6 z-10">
+        <ThemeToggle />
+      </div>
+
       {/* Background effects */}
       <div className={`absolute inset-0 ${
         isDark 
@@ -70,11 +90,6 @@ export default function RegisterPage() {
       <div className={`absolute bottom-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl ${
         isDark ? 'bg-pink-500/10' : 'bg-pink-300/20'
       }`} />
-
-      {/* Theme Toggle */}
-      <div className="absolute top-6 right-6 z-20">
-        <ThemeToggle />
-      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}

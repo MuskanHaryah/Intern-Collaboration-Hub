@@ -380,9 +380,9 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className={isDark ? 'text-white' : 'text-gray-900'}>
-                        <Link to={`/projects/${project.id}`} className="font-medium hover:text-purple-400 transition-colors">
+                        <span className="font-medium">
                           {project.name}
-                        </Link>
+                        </span>
                         <span className={`ml-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                           — {project.taskCount} tasks, {project.completedTasks} done
                         </span>
