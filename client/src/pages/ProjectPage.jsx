@@ -8,6 +8,7 @@ import { OnlineUsers, LoadingStates, ErrorStates, ConfirmationModal } from '../c
 import InviteMembersModal from '../components/UI/InviteMembersModal';
 import { projectService, taskService } from '../services';
 import useThemeStore from '../stores/themeStore';
+import useAuthStore from '../stores/authStore';
 
 export default function ProjectPage() {
   const { projectId } = useParams();
@@ -24,6 +25,7 @@ export default function ProjectPage() {
   const { joinProjectRoom, leaveProjectRoom, onlineUsers, isConnected } = useSocket();
   const theme = useThemeStore((s) => s.theme);
   const isDark = theme === 'dark';
+  const currentUser = useAuthStore((s) => s.user);
 
   useEffect(() => {
     if (projectId && isConnected) joinProjectRoom(projectId);
@@ -305,10 +307,6 @@ export default function ProjectPage() {
 
             <div className="flex items-center gap-3">
               <OnlineUsers users={onlineUsers} />
-              <div className="flex items-center gap-1.5">
-                <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-                <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{isConnected ? 'Live' : 'Offline'}</span>
-              </div>
 
               {/* View Toggle */}
               <div className={`flex items-center rounded-lg p-1 ${isDark ? 'bg-white/5' : 'bg-gray-100'}`}>
@@ -343,11 +341,13 @@ export default function ProjectPage() {
                 {project.members.length > 4 && (
                   <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm ${isDark ? 'bg-white/10 border-[#0a0a0f] text-gray-400' : 'bg-gray-200 border-white text-gray-500'}`}>+{project.members.length - 4}</div>
                 )}
-                <button onClick={() => setShowInviteModal(true)} title="Invite Members" className={`w-8 h-8 rounded-full border-2 border-dashed flex items-center justify-center transition-all ml-2 ${isDark ? 'bg-white/5 border-white/20 text-gray-400 hover:text-white hover:border-white/40' : 'bg-gray-50 border-gray-300 text-gray-400 hover:text-gray-600 hover:border-gray-400'}`}>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                </button>
+                {(currentUser?.id === (project.owner?._id || project.owner) || currentUser?._id === (project.owner?._id || project.owner)) && (
+                  <button onClick={() => setShowInviteModal(true)} title="Invite Members" className={`w-8 h-8 rounded-full border-2 border-dashed flex items-center justify-center transition-all ml-2 ${isDark ? 'bg-white/5 border-white/20 text-gray-400 hover:text-white hover:border-white/40' : 'bg-gray-50 border-gray-300 text-gray-400 hover:text-gray-600 hover:border-gray-400'}`}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -412,6 +412,7 @@ export default function ProjectPage() {
               onDeleteTask={(id) => setDeleteTaskConfirm({ open: true, taskId: id })}
               onMoveTask={handleMoveTask}
               projectMembers={project.members}
+              isOwner={currentUser?.id === (project.owner?._id || project.owner) || currentUser?._id === (project.owner?._id || project.owner)}
             />
           </div>
           {showMilestones && (

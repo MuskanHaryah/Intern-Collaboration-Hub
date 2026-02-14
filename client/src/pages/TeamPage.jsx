@@ -13,6 +13,7 @@ export default function TeamPage() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [isProjectOwner, setIsProjectOwner] = useState(false);
 
   const theme = useThemeStore((s) => s.theme);
   const isDark = theme === 'dark';
@@ -29,6 +30,13 @@ export default function TeamPage() {
 
       const projectsRes = await projectService.getAll();
       const fetchedProjects = projectsRes.data || [];
+
+      // Check if current user owns any project
+      const ownsProject = fetchedProjects.some((p) => {
+        const ownerId = p.owner?._id || p.owner;
+        return ownerId === currentUser?.id || ownerId === currentUser?._id;
+      });
+      setIsProjectOwner(ownsProject);
 
       // Collect unique members across all projects
       const memberMap = new Map();
@@ -116,17 +124,19 @@ export default function TeamPage() {
       title="Team"
       subtitle={`${members.length} member${members.length !== 1 ? 's' : ''} across your projects`}
       headerActions={
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setInviteOpen(true)}
-          className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 transition-all"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-          </svg>
-          Invite Member
-        </motion.button>
+        isProjectOwner ? (
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setInviteOpen(true)}
+            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 transition-all"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+            </svg>
+            Invite Member
+          </motion.button>
+        ) : null
       }
     >
       <TeamInviteModal isOpen={inviteOpen} onClose={() => setInviteOpen(false)} onInviteSent={fetchTeamMembers} />

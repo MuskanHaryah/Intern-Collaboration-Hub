@@ -83,7 +83,7 @@ export default function AddMilestoneModal({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className={`w-full max-w-md rounded-2xl shadow-2xl ${
+          className={`w-full max-w-lg rounded-2xl shadow-2xl ${
             isDark ? 'bg-[#12121a] border border-white/10' : 'bg-white border border-gray-200'
           }`}
         >
@@ -146,7 +146,7 @@ export default function AddMilestoneModal({
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="What does this milestone represent?"
-                rows={3}
+                rows={4}
                 className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all resize-none ${
                   isDark 
                     ? 'bg-white/5 border-white/10 text-white placeholder-gray-500' 

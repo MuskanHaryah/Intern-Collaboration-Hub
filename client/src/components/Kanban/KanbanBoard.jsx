@@ -14,7 +14,8 @@ export default function KanbanBoard({
   onUpdateTask, 
   onDeleteTask,
   onMoveTask,
-  projectMembers = []
+  projectMembers = [],
+  isOwner = false,
 }) {
   const isDark = useThemeStore((s) => s.theme) === 'dark';
   const { editingUsers } = useSocket();
@@ -235,14 +236,16 @@ export default function KanbanBoard({
                         {columnTasks.length}
                       </span>
                     </div>
-                    <button
-                      onClick={() => setShowAddTask(column.id)}
-                      className={`p-1.5 rounded-lg transition-all ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'}`}
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                    </button>
+                    {isOwner && (
+                      <button
+                        onClick={() => setShowAddTask(column.id)}
+                        className={`p-1.5 rounded-lg transition-all ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'}`}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -299,12 +302,14 @@ export default function KanbanBoard({
                             </svg>
                           </div>
                           <p className="text-sm mb-2">No tasks</p>
-                          <button
-                            onClick={() => setShowAddTask(column.id)}
-                            className="text-purple-400 hover:text-purple-300 text-sm font-medium"
-                          >
-                            + Add first task
-                          </button>
+                          {isOwner && (
+                            <button
+                              onClick={() => setShowAddTask(column.id)}
+                              className="text-purple-400 hover:text-purple-300 text-sm font-medium"
+                            >
+                              + Add first task
+                            </button>
+                          )}
                         </div>
                       )}
 
@@ -319,17 +324,19 @@ export default function KanbanBoard({
                 </Droppable>
 
                 {/* Add Task Button */}
-                <div className={`p-3 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
-                  <button
-                    onClick={() => setShowAddTask(column.id)}
-                    className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl transition-all group ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'}`}
-                  >
-                    <svg className="w-4 h-4 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Add Task
-                  </button>
-                </div>
+                {isOwner && (
+                  <div className={`p-3 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
+                    <button
+                      onClick={() => setShowAddTask(column.id)}
+                      className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl transition-all group ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'}`}
+                    >
+                      <svg className="w-4 h-4 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Add Task
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}
