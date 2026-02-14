@@ -15,7 +15,6 @@ export default function DashboardPage() {
     completedTasks: 0,
     teamMembers: 0,
   });
-  const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
@@ -99,10 +98,7 @@ export default function DashboardPage() {
     }
   };
 
-  const handleProjectCreated = () => {
-    setShowNewProjectModal(false);
-    fetchDashboardData(); // Refresh data after creating project
-  };
+
 
   const getPriorityIcon = (priority) => {
     const colors = { low: 'text-gray-400', medium: 'text-yellow-500', high: 'text-orange-500', urgent: 'text-red-500' };
@@ -127,19 +123,6 @@ export default function DashboardPage() {
     <DashboardLayout
       title="Dashboard"
       subtitle={`Welcome back, ${user?.name?.split(' ')[0] || 'there'}! Here's what's happening with your projects.`}
-      headerActions={
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setShowNewProjectModal(true)}
-          className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 transition-all"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          New Project
-        </motion.button>
-      }
     >
         {/* Loading State */}
         {loading && <LoadingStates.LoadingOverlay fullScreen message="Loading your dashboard..." />}
@@ -253,15 +236,15 @@ export default function DashboardPage() {
                   <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                     Get started by creating your first project
                   </p>
-                  <button
-                    onClick={() => setShowNewProjectModal(true)}
+                  <Link
+                    to="/projects"
                     className="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 transition-all"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    Create Project
-                  </button>
+                    Go to Projects
+                  </Link>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{projects.map((project, index) => (
@@ -415,170 +398,6 @@ export default function DashboardPage() {
         </div>
         </>
         )}
-
-      {/* New Project Modal */}
-      {showNewProjectModal && (
-        <NewProjectModal onClose={() => setShowNewProjectModal(false)} onSuccess={handleProjectCreated} />
-      )}
     </DashboardLayout>
-  );
-}
-
-// New Project Modal Component
-function NewProjectModal({ onClose, onSuccess }) {
-  const theme = useThemeStore((s) => s.theme);
-  const isDark = theme === 'dark';
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    color: '#b026ff',
-    priority: 'medium',
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    
-    try {
-      await projectService.create(formData);
-      onSuccess(); // Refresh dashboard data
-    } catch (err) {
-      console.error('Error creating project:', err);
-      setError(err.message || 'Failed to create project');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const colors = ['#b026ff', '#ff2d95', '#00d4ff', '#10b981', '#f59e0b', '#ef4444'];
-
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className={`rounded-2xl p-6 w-full max-w-md border transition-colors duration-500 ${
-          isDark ? 'bg-[#12121a] border-white/10' : 'bg-white border-gray-200 shadow-xl'
-        }`}
-      >
-        <div className="flex items-center justify-between mb-6">
-          <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Create New Project</h2>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-white transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {error && (
-            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-              {error}
-            </div>
-          )}
-          
-          <div>
-            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-              Project Name
-            </label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-              className={`w-full px-4 py-3 border rounded-xl transition-all focus:outline-none focus:border-purple-500 ${
-                isDark 
-                  ? 'bg-[#1a1a2e] border-white/10 text-white placeholder-gray-500' 
-                  : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
-              }`}
-              placeholder="Enter project name"
-            />
-          </div>
-
-          <div>
-            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-              Description
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-              className={`w-full px-4 py-3 border rounded-xl transition-all resize-none focus:outline-none focus:border-purple-500 ${
-                isDark 
-                  ? 'bg-[#1a1a2e] border-white/10 text-white placeholder-gray-500' 
-                  : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
-              }`}
-              placeholder="Describe your project"
-            />
-          </div>
-
-          <div>
-            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-              Color
-            </label>
-            <div className="flex gap-3">
-              {colors.map((color) => (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, color })}
-                  className={`w-8 h-8 rounded-full transition-all ${
-                    formData.color === color ? 'ring-2 ring-white ring-offset-2 ring-offset-[#12121a]' : ''
-                  }`}
-                  style={{ backgroundColor: color }}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-              Priority
-            </label>
-            <select
-              value={formData.priority}
-              onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-              className={`w-full px-4 py-3 border rounded-xl transition-all focus:outline-none focus:border-purple-500 ${
-                isDark 
-                  ? 'bg-[#1a1a2e] border-white/10 text-white' 
-                  : 'bg-gray-50 border-gray-200 text-gray-900'
-              }`}
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-              <option value="urgent">Urgent</option>
-            </select>
-          </div>
-
-          <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className={`flex-1 px-4 py-3 border rounded-xl transition-all ${
-                isDark 
-                  ? 'bg-white/5 border-white/10 text-white hover:bg-white/10' 
-                  : 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-pink-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Creating...' : 'Create Project'}
-            </button>
-          </div>
-        </form>
-      </motion.div>
-    </div>
   );
 }

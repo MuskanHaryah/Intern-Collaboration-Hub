@@ -83,7 +83,7 @@ export default function AddMilestoneModal({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className={`w-full max-w-md rounded-2xl shadow-2xl max-h-[90vh] flex flex-col ${
+          className={`w-full max-w-md rounded-2xl shadow-2xl ${
             isDark ? 'bg-[#12121a] border border-white/10' : 'bg-white border border-gray-200'
           }`}
         >
@@ -117,7 +117,7 @@ export default function AddMilestoneModal({
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
+          <form onSubmit={handleSubmit} className="p-6 space-y-5">
             {/* Title */}
             <div>
               <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
