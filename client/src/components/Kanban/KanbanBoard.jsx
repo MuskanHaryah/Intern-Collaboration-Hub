@@ -222,30 +222,18 @@ export default function KanbanBoard({
               >
                 {/* Column Header */}
                 <div className={`p-4 border-b ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-3 h-3 rounded-full shadow-lg"
-                        style={{ 
-                          backgroundColor: column.color,
-                          boxShadow: `0 0 10px ${column.color}50`
-                        }}
-                      />
-                      <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{column.name}</h3>
-                      <span className={`px-2 py-0.5 rounded-full text-xs ${isDark ? 'bg-white/10 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>
-                        {columnTasks.length}
-                      </span>
-                    </div>
-                    {isOwner && (
-                      <button
-                        onClick={() => setShowAddTask(column.id)}
-                        className={`p-1.5 rounded-lg transition-all ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'}`}
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                      </button>
-                    )}
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-3 h-3 rounded-full shadow-lg"
+                      style={{ 
+                        backgroundColor: column.color,
+                        boxShadow: `0 0 10px ${column.color}50`
+                      }}
+                    />
+                    <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{column.name}</h3>
+                    <span className={`px-2 py-0.5 rounded-full text-xs ${isDark ? 'bg-white/10 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>
+                      {columnTasks.length}
+                    </span>
                   </div>
                 </div>
 
@@ -301,15 +289,7 @@ export default function KanbanBoard({
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
                           </div>
-                          <p className="text-sm mb-2">No tasks</p>
-                          {isOwner && (
-                            <button
-                              onClick={() => setShowAddTask(column.id)}
-                              className="text-purple-400 hover:text-purple-300 text-sm font-medium"
-                            >
-                              + Add first task
-                            </button>
-                          )}
+                          <p className="text-sm">No tasks</p>
                         </div>
                       )}
 

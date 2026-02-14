@@ -352,37 +352,7 @@ export default function ProjectPage() {
             </div>
           </div>
 
-          {/* Stats Bar */}
-          <div className={`flex items-center gap-6 mt-4 pt-4 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
-            <div className="flex items-center gap-2 text-sm">
-              <span className={isDark ? 'text-gray-500' : 'text-gray-400'}>Tasks:</span>
-              <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{taskStats.total}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <div className="w-2 h-2 rounded-full bg-green-500" />
-              <span className={isDark ? 'text-gray-500' : 'text-gray-400'}>Done:</span>
-              <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{taskStats.completed}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <div className="w-2 h-2 rounded-full bg-yellow-500" />
-              <span className={isDark ? 'text-gray-500' : 'text-gray-400'}>In Progress:</span>
-              <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{taskStats.inProgress}</span>
-            </div>
-            {taskStats.overdue > 0 && (
-              <div className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 rounded-full bg-red-500" />
-                <span className="text-red-400">Overdue:</span>
-                <span className="text-red-400 font-medium">{taskStats.overdue}</span>
-              </div>
-            )}
-            <div className="flex-1" />
-            <div className="flex items-center gap-2 text-sm">
-              <div className={`h-2 w-32 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
-                <div className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
-              </div>
-              <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>{progress}%</span>
-            </div>
-          </div>
+
         </div>
       </header>
 
