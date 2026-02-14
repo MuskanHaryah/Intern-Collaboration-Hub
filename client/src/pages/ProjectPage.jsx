@@ -532,13 +532,13 @@ function OverviewTab({ project, tasks, taskStats, progress, memberStats, milesto
           <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>Task Summary</h3>
           <div className="grid grid-cols-2 gap-4">
             {[
-              { label: 'Total Tasks', value: taskStats.total, icon: '📋', bg: isDark ? 'bg-purple-500/10' : 'bg-purple-50' },
-              { label: 'Completed', value: taskStats.completed, icon: '✅', bg: isDark ? 'bg-green-500/10' : 'bg-green-50' },
-              { label: 'In Progress', value: taskStats.inProgress, icon: '⚡', bg: isDark ? 'bg-yellow-500/10' : 'bg-yellow-50' },
-              { label: 'Overdue', value: taskStats.overdue, icon: '🔴', bg: isDark ? 'bg-red-500/10' : 'bg-red-50' },
+              { label: 'Total Tasks', value: taskStats.total, iconSvg: (<svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>), bg: isDark ? 'bg-purple-500/10' : 'bg-purple-50' },
+              { label: 'Completed', value: taskStats.completed, iconSvg: (<svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>), bg: isDark ? 'bg-green-500/10' : 'bg-green-50' },
+              { label: 'In Progress', value: taskStats.inProgress, iconSvg: (<svg className="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>), bg: isDark ? 'bg-yellow-500/10' : 'bg-yellow-50' },
+              { label: 'Overdue', value: taskStats.overdue, iconSvg: (<svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>), bg: isDark ? 'bg-red-500/10' : 'bg-red-50' },
             ].map(stat => (
               <div key={stat.label} className={`rounded-xl p-4 ${stat.bg}`}>
-                <div className="text-lg mb-1">{stat.icon}</div>
+                <div className="mb-1">{stat.iconSvg}</div>
                 <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{stat.value}</p>
                 <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{stat.label}</p>
               </div>

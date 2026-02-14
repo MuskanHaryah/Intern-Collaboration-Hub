@@ -156,26 +156,7 @@ export default function HomePage() {
             </Link>
           </motion.div>
 
-          {/* Stats */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex gap-8 mt-12"
-          >
-            <div>
-              <p className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>500+</p>
-              <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Active Interns</p>
-            </div>
-            <div>
-              <p className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>1.2K</p>
-              <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Projects Created</p>
-            </div>
-            <div>
-              <p className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>99%</p>
-              <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Satisfaction</p>
-            </div>
-          </motion.div>
+
         </div>
 
         {/* Right Content - Abstract Visual */}
@@ -277,7 +258,7 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, delay: 0.8 }}
-              className="absolute top-[130px] left-1/2 -translate-x-1/2 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-pink-500/30 animate-pulse"
+              className="absolute top-[140px] left-[295px] -translate-x-1/2 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-pink-500/30 animate-pulse z-10"
             >
               +5 Updates
             </motion.div>
@@ -467,18 +448,6 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className={`h-px w-full ${isDark ? 'bg-white/10' : 'bg-gray-200'}`} />
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  {[
-                    { n: '50+', l: 'Universities' },
-                    { n: '200+', l: 'Teams' },
-                    { n: '98%', l: 'Retention' },
-                  ].map((s) => (
-                    <div key={s.l}>
-                      <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{s.n}</p>
-                      <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{s.l}</p>
-                    </div>
-                  ))}
-                </div>
                 <div className="flex gap-2 pt-2">
                   {['React', 'Node.js', 'MongoDB', 'Socket.IO'].map((t) => (
                     <span key={t} className={`px-3 py-1 text-xs rounded-full ${

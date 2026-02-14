@@ -4,8 +4,10 @@ import FileUpload from './FileUpload';
 import AttachmentList from './AttachmentList';
 import taskService from '../../services/taskService';
 import { useToastStore } from '../../stores';
+import useThemeStore from '../../stores/themeStore';
 
 export default function TaskDetailsModal({ isOpen, onClose, task, onUpdate, projectMembers = [] }) {
+  const isDark = useThemeStore((s) => s.theme) === 'dark';
   const [activeTab, setActiveTab] = useState('details'); // 'details', 'attachments', 'activity'
   const [localTask, setLocalTask] = useState(task);
   const [isUploading, setIsUploading] = useState(false);
@@ -88,13 +90,13 @@ export default function TaskDetailsModal({ isOpen, onClose, task, onUpdate, proj
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-4xl bg-[#12121a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+            className={`w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col ${isDark ? 'bg-[#12121a] border border-white/10' : 'bg-white border border-gray-200'}`}
           >
             {/* Header */}
-            <div className="p-6 border-b border-white/10">
+            <div className={`p-6 border-b ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-white mb-2">{localTask.title}</h2>
+                  <h2 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>{localTask.title}</h2>
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getPriorityColor(localTask.priority)}`}>
                       {localTask.priority}
@@ -115,7 +117,7 @@ export default function TaskDetailsModal({ isOpen, onClose, task, onUpdate, proj
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                  className={`p-2 rounded-lg transition-all ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -125,7 +127,7 @@ export default function TaskDetailsModal({ isOpen, onClose, task, onUpdate, proj
             </div>
 
             {/* Tabs */}
-            <div className="border-b border-white/10">
+            <div className={`border-b ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
               <div className="flex gap-1 px-6">
                 {[
                   { id: 'details', label: 'Details', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
@@ -138,7 +140,7 @@ export default function TaskDetailsModal({ isOpen, onClose, task, onUpdate, proj
                     className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all ${
                       activeTab === tab.id
                         ? 'text-purple-400 border-purple-500'
-                        : 'text-gray-500 border-transparent hover:text-gray-300'
+                        : isDark ? 'text-gray-500 border-transparent hover:text-gray-300' : 'text-gray-400 border-transparent hover:text-gray-600'
                     }`}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,8 +170,8 @@ export default function TaskDetailsModal({ isOpen, onClose, task, onUpdate, proj
                   >
                     {/* Description */}
                     <div>
-                      <h3 className="text-gray-400 text-sm font-medium mb-2">Description</h3>
-                      <p className="text-white">
+                      <h3 className={`text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Description</h3>
+                      <p className={isDark ? 'text-white' : 'text-gray-900'}>
                         {localTask.description || 'No description provided'}
                       </p>
                     </div>
@@ -177,33 +179,33 @@ export default function TaskDetailsModal({ isOpen, onClose, task, onUpdate, proj
                     {/* Dates */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <h3 className="text-gray-400 text-sm font-medium mb-2">Due Date</h3>
-                        <p className="text-white">{formatDate(localTask.dueDate)}</p>
+                        <h3 className={`text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Due Date</h3>
+                        <p className={isDark ? 'text-white' : 'text-gray-900'}>{formatDate(localTask.dueDate)}</p>
                       </div>
                       <div>
-                        <h3 className="text-gray-400 text-sm font-medium mb-2">Created</h3>
-                        <p className="text-white">{formatDate(localTask.createdAt)}</p>
+                        <h3 className={`text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Created</h3>
+                        <p className={isDark ? 'text-white' : 'text-gray-900'}>{formatDate(localTask.createdAt)}</p>
                       </div>
                     </div>
 
                     {/* Assignees */}
                     {localTask.assignees?.length > 0 && (
                       <div>
-                        <h3 className="text-gray-400 text-sm font-medium mb-2">Assigned To</h3>
+                        <h3 className={`text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Assigned To</h3>
                         <div className="flex flex-wrap gap-2">
                           {localTask.assignees.map((assigneeId, index) => {
                             const assignee = getAssigneeInfo(assigneeId);
                             return assignee ? (
                               <div
                                 key={index}
-                                className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg border border-white/10"
+                                className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${isDark ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'}`}
                               >
                                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-medium">
                                   {assignee.name?.charAt(0) || 'U'}
                                 </div>
                                 <div>
-                                  <p className="text-white text-sm font-medium">{assignee.name}</p>
-                                  <p className="text-gray-500 text-xs">{assignee.email}</p>
+                                  <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{assignee.name}</p>
+                                  <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{assignee.email}</p>
                                 </div>
                               </div>
                             ) : null;
@@ -341,10 +343,10 @@ export default function TaskDetailsModal({ isOpen, onClose, task, onUpdate, proj
             </div>
 
             {/* Footer */}
-            <div className="p-6 border-t border-white/10 flex gap-3 justify-end">
+            <div className={`p-6 border-t flex gap-3 justify-end ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
               <button
                 onClick={onClose}
-                className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-all"
+                className={`px-6 py-3 rounded-xl font-medium transition-all ${isDark ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}
               >
                 Close
               </button>

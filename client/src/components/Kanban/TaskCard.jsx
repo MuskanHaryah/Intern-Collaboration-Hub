@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { EditingIndicator } from '../UI';
+import useThemeStore from '../../stores/themeStore';
 
 export default function TaskCard({ task, onUpdate, onDelete, onView, isDragging = false, editingUsers = [] }) {
+  const isDark = useThemeStore((s) => s.theme) === 'dark';
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -51,10 +53,12 @@ export default function TaskCard({ task, onUpdate, onDelete, onView, isDragging 
   return (
     <div
       onClick={() => onView?.(task)}
-      className={`bg-[#1a1a2e] border rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all group relative ${
+      className={`rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all group relative ${
+        isDark ? 'bg-[#1a1a2e]' : 'bg-white shadow-sm'
+      } ${
         isDragging 
-          ? 'border-purple-500 shadow-lg shadow-purple-500/20 ring-2 ring-purple-500/30' 
-          : 'border-white/10 hover:border-purple-500/50'
+          ? 'border border-purple-500 shadow-lg shadow-purple-500/20 ring-2 ring-purple-500/30' 
+          : isDark ? 'border border-white/10 hover:border-purple-500/50' : 'border border-gray-200 hover:border-purple-300'
       } ${editingUsers.length > 0 ? 'ring-2 ring-cyan-500/30' : ''}`}
     >
       {/* Editing Indicator */}
@@ -83,7 +87,7 @@ export default function TaskCard({ task, onUpdate, onDelete, onView, isDragging 
       )}
 
       {/* Title */}
-      <h4 className="text-white font-medium mb-2 group-hover:text-purple-400 transition-colors">
+      <h4 className={`font-medium mb-2 group-hover:text-purple-400 transition-colors ${isDark ? 'text-white' : 'text-gray-900'}`}>
         {task.title}
       </h4>
 
@@ -103,7 +107,7 @@ export default function TaskCard({ task, onUpdate, onDelete, onView, isDragging 
               {checklistProgress.completed}/{checklistProgress.total}
             </span>
           </div>
-          <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+          <div className={`h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
             <div
               className="h-full bg-purple-500 rounded-full transition-all"
               style={{
@@ -115,7 +119,7 @@ export default function TaskCard({ task, onUpdate, onDelete, onView, isDragging 
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5">
+      <div className={`flex items-center justify-between mt-3 pt-3 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
         <div className="flex items-center gap-2">
           {/* Priority Badge */}
           <span className={`px-2 py-0.5 rounded text-xs font-medium border ${getPriorityBg(task.priority)}`}>
@@ -160,14 +164,14 @@ export default function TaskCard({ task, onUpdate, onDelete, onView, isDragging 
               {task.assignees.slice(0, 3).map((assignee, index) => (
                 <div
                   key={assignee.id || index}
-                  className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 border-2 border-[#1a1a2e] flex items-center justify-center text-white text-xs font-medium"
+                  className={`w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 border-2 flex items-center justify-center text-white text-xs font-medium ${isDark ? 'border-[#1a1a2e]' : 'border-white'}`}
                   title={assignee.name}
                 >
                   {assignee.name?.charAt(0) || assignee.avatar || 'U'}
                 </div>
               ))}
               {task.assignees.length > 3 && (
-                <div className="w-6 h-6 rounded-full bg-white/10 border-2 border-[#1a1a2e] flex items-center justify-center text-gray-400 text-xs">
+                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-gray-400 text-xs ${isDark ? 'bg-white/10 border-[#1a1a2e]' : 'bg-gray-200 border-white'}`}>
                   +{task.assignees.length - 3}
                 </div>
               )}
@@ -181,7 +185,7 @@ export default function TaskCard({ task, onUpdate, onDelete, onView, isDragging 
                 e.stopPropagation();
                 setShowMenu(!showMenu);
               }}
-              className="p-1 text-gray-500 hover:text-white opacity-0 group-hover:opacity-100 transition-all"
+              className={`p-1 opacity-0 group-hover:opacity-100 transition-all ${isDark ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-gray-700'}`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
@@ -193,7 +197,7 @@ export default function TaskCard({ task, onUpdate, onDelete, onView, isDragging 
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="absolute right-0 top-full mt-1 w-40 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-xl z-10 overflow-hidden"
+                className={`absolute right-0 top-full mt-1 w-40 rounded-xl shadow-xl z-10 overflow-hidden ${isDark ? 'bg-[#1a1a2e] border border-white/10' : 'bg-white border border-gray-200'}`}
               >
                 <button
                   onClick={(e) => {
@@ -201,7 +205,7 @@ export default function TaskCard({ task, onUpdate, onDelete, onView, isDragging 
                     onView?.(task);
                     setShowMenu(false);
                   }}
-                  className="w-full flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                  className={`w-full flex items-center gap-2 px-4 py-2 transition-all ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -215,7 +219,7 @@ export default function TaskCard({ task, onUpdate, onDelete, onView, isDragging 
                     setIsEditing(true);
                     setShowMenu(false);
                   }}
-                  className="w-full flex items-center gap-2 px-4 py-2 text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                  className={`w-full flex items-center gap-2 px-4 py-2 transition-all ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

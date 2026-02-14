@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MilestoneCard from './MilestoneCard';
 import AddMilestoneModal from './AddMilestoneModal';
+import useThemeStore from '../../stores/themeStore';
 
 /**
  * MilestoneList - Main milestone tracking component
@@ -19,6 +20,7 @@ export default function MilestoneList({
   const [editingMilestone, setEditingMilestone] = useState(null);
   const [isExpanded, setIsExpanded] = useState(true);
   const [filter, setFilter] = useState('all'); // all, active, completed
+  const isDark = useThemeStore((s) => s.theme) === 'dark';
 
   // Calculate milestone stats
   const stats = useMemo(() => {
@@ -97,10 +99,10 @@ export default function MilestoneList({
   };
 
   return (
-    <div className="bg-[#12121a]/80 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
+    <div className={`backdrop-blur-sm rounded-2xl overflow-hidden ${isDark ? 'bg-[#12121a]/80 border border-white/10' : 'bg-white border border-gray-200 shadow-sm'}`}>
       {/* Header */}
       <div 
-        className="p-4 border-b border-white/10 cursor-pointer hover:bg-white/5 transition-all"
+        className={`p-4 border-b cursor-pointer transition-all ${isDark ? 'border-white/10 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'}`}
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center justify-between">
@@ -111,7 +113,7 @@ export default function MilestoneList({
               </svg>
             </div>
             <div>
-              <h3 className="font-semibold text-white">Milestones</h3>
+              <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Milestones</h3>
               <p className="text-sm text-gray-500">
                 {stats.completed} of {stats.total} completed
                 {stats.overdue > 0 && (
@@ -124,7 +126,7 @@ export default function MilestoneList({
           <div className="flex items-center gap-3">
             {/* Overall Progress */}
             <div className="hidden sm:flex items-center gap-2">
-              <div className="w-24 h-2 bg-white/10 rounded-full overflow-hidden">
+              <div className={`w-24 h-2 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${overallProgress}%` }}
@@ -141,7 +143,7 @@ export default function MilestoneList({
                 e.stopPropagation();
                 setShowAddModal(true);
               }}
-              className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+              className={`p-2 rounded-lg transition-all ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'}`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -180,7 +182,7 @@ export default function MilestoneList({
                     className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
                       filter === f
                         ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                        : 'text-gray-500 hover:text-white hover:bg-white/5'
+                        : isDark ? 'text-gray-500 hover:text-white hover:bg-white/5' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'
                     }`}
                   >
                     {f.charAt(0).toUpperCase() + f.slice(1)}

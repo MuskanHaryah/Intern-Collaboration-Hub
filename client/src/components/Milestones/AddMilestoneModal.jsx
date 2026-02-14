@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import useThemeStore from '../../stores/themeStore';
 
 /**
  * AddMilestoneModal - Modal for creating/editing milestones
@@ -11,6 +12,7 @@ export default function AddMilestoneModal({
   milestone = null, // If provided, we're editing
   projectId,
 }) {
+  const isDark = useThemeStore((s) => s.theme) === 'dark';
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -81,10 +83,12 @@ export default function AddMilestoneModal({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-md bg-[#12121a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+          className={`w-full max-w-md rounded-2xl shadow-2xl max-h-[90vh] flex flex-col ${
+            isDark ? 'bg-[#12121a] border border-white/10' : 'bg-white border border-gray-200'
+          }`}
         >
           {/* Header */}
-          <div className="p-6 border-b border-white/10 bg-gradient-to-r from-purple-500/10 to-pink-500/10">
+          <div className={`p-6 border-b bg-gradient-to-r from-purple-500/10 to-pink-500/10 ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
@@ -93,17 +97,17 @@ export default function AddMilestoneModal({
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-white">
+                  <h2 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {isEditing ? 'Edit Milestone' : 'New Milestone'}
                   </h2>
-                  <p className="text-sm text-gray-500">
+                  <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                     {isEditing ? 'Update milestone details' : 'Track your project progress'}
                   </p>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                className={`p-2 rounded-lg transition-all ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -113,10 +117,10 @@ export default function AddMilestoneModal({
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
+              <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Milestone Title <span className="text-red-400">*</span>
               </label>
               <input
@@ -124,14 +128,18 @@ export default function AddMilestoneModal({
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Beta Release, Phase 1 Complete"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all"
+                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all ${
+                  isDark 
+                    ? 'bg-white/5 border-white/10 text-white placeholder-gray-500' 
+                    : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
+                }`}
                 autoFocus
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
+              <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Description
               </label>
               <textarea
@@ -139,52 +147,51 @@ export default function AddMilestoneModal({
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="What does this milestone represent?"
                 rows={3}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all resize-none"
+                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all resize-none ${
+                  isDark 
+                    ? 'bg-white/5 border-white/10 text-white placeholder-gray-500' 
+                    : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'
+                }`}
               />
             </div>
 
             {/* Due Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
+              <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Due Date <span className="text-red-400">*</span>
               </label>
               <input
                 type="date"
                 value={formData.dueDate}
                 onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all [color-scheme:dark]"
+                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all ${
+                  isDark 
+                    ? 'bg-white/5 border-white/10 text-white [color-scheme:dark]' 
+                    : 'bg-gray-50 border-gray-200 text-gray-900'
+                }`}
               />
               
               {/* Quick Date Buttons */}
               <div className="flex flex-wrap gap-2 mt-2">
-                <button
-                  type="button"
-                  onClick={() => setQuickDate(7)}
-                  className="px-3 py-1 text-xs bg-white/5 text-gray-400 rounded-lg hover:bg-white/10 hover:text-white transition-all"
-                >
-                  1 week
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setQuickDate(14)}
-                  className="px-3 py-1 text-xs bg-white/5 text-gray-400 rounded-lg hover:bg-white/10 hover:text-white transition-all"
-                >
-                  2 weeks
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setQuickDate(30)}
-                  className="px-3 py-1 text-xs bg-white/5 text-gray-400 rounded-lg hover:bg-white/10 hover:text-white transition-all"
-                >
-                  1 month
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setQuickDate(90)}
-                  className="px-3 py-1 text-xs bg-white/5 text-gray-400 rounded-lg hover:bg-white/10 hover:text-white transition-all"
-                >
-                  3 months
-                </button>
+                {[
+                  { label: '1 week', days: 7 },
+                  { label: '2 weeks', days: 14 },
+                  { label: '1 month', days: 30 },
+                  { label: '3 months', days: 90 },
+                ].map(preset => (
+                  <button
+                    key={preset.days}
+                    type="button"
+                    onClick={() => setQuickDate(preset.days)}
+                    className={`px-3 py-1 text-xs rounded-lg transition-all ${
+                      isDark 
+                        ? 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white' 
+                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -193,7 +200,11 @@ export default function AddMilestoneModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-3 bg-white/5 text-gray-400 rounded-xl font-medium hover:bg-white/10 hover:text-white transition-all"
+                className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all ${
+                  isDark 
+                    ? 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white' 
+                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
+                }`}
               >
                 Cancel
               </button>

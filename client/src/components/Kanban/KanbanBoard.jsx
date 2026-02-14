@@ -5,6 +5,7 @@ import TaskCard from './TaskCard';
 import AddTaskModal from './AddTaskModal';
 import TaskDetailsModal from './TaskDetailsModal';
 import { useSocket } from '../../socket';
+import useThemeStore from '../../stores/themeStore';
 
 export default function KanbanBoard({ 
   columns: initialColumns, 
@@ -15,6 +16,7 @@ export default function KanbanBoard({
   onMoveTask,
   projectMembers = []
 }) {
+  const isDark = useThemeStore((s) => s.theme) === 'dark';
   const { editingUsers } = useSocket();
   const [columns, setColumns] = useState(
     initialColumns || [
@@ -131,7 +133,7 @@ export default function KanbanBoard({
               className={`flex items-center gap-2 px-4 py-2 border rounded-xl transition-all ${
                 filterPriority !== 'all'
                   ? 'bg-purple-500/20 border-purple-500/50 text-purple-400'
-                  : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
+                  : isDark ? 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10' : 'bg-gray-50 border-gray-200 text-gray-500 hover:text-gray-700 hover:bg-gray-100'
               }`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,7 +152,7 @@ export default function KanbanBoard({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="absolute right-0 top-full mt-2 w-48 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-xl z-50 overflow-hidden"
+                  className={`absolute right-0 top-full mt-2 w-48 rounded-xl shadow-xl z-50 overflow-hidden ${isDark ? 'bg-[#1a1a2e] border border-white/10' : 'bg-white border border-gray-200'}`}
                 >
                   <div className="p-2">
                     <p className="px-3 py-2 text-xs text-gray-500 font-medium uppercase">Priority</p>
@@ -200,7 +202,7 @@ export default function KanbanBoard({
               placeholder="Search tasks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-all w-64"
+              className={`pl-10 pr-4 py-2 border rounded-xl focus:outline-none focus:border-purple-500 transition-all w-64 ${isDark ? 'bg-white/5 border-white/10 text-white placeholder-gray-500' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'}`}
             />
           </div>
         </div>
@@ -215,10 +217,10 @@ export default function KanbanBoard({
             return (
               <div
                 key={column.id}
-                className="flex-shrink-0 w-80 flex flex-col bg-[#12121a]/50 rounded-2xl border border-white/10 h-full"
+                className={`flex-shrink-0 w-80 flex flex-col rounded-2xl border h-full ${isDark ? 'bg-[#12121a]/50 border-white/10' : 'bg-white/60 border-gray-200'}`}
               >
                 {/* Column Header */}
-                <div className="p-4 border-b border-white/10">
+                <div className={`p-4 border-b ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div
@@ -228,14 +230,14 @@ export default function KanbanBoard({
                           boxShadow: `0 0 10px ${column.color}50`
                         }}
                       />
-                      <h3 className="font-semibold text-white">{column.name}</h3>
-                      <span className="px-2 py-0.5 bg-white/10 rounded-full text-xs text-gray-400">
+                      <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{column.name}</h3>
+                      <span className={`px-2 py-0.5 rounded-full text-xs ${isDark ? 'bg-white/10 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>
                         {columnTasks.length}
                       </span>
                     </div>
                     <button
                       onClick={() => setShowAddTask(column.id)}
-                      className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                      className={`p-1.5 rounded-lg transition-all ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/10' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'}`}
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -317,10 +319,10 @@ export default function KanbanBoard({
                 </Droppable>
 
                 {/* Add Task Button */}
-                <div className="p-3 border-t border-white/5">
+                <div className={`p-3 border-t ${isDark ? 'border-white/5' : 'border-gray-100'}`}>
                   <button
                     onClick={() => setShowAddTask(column.id)}
-                    className="w-full flex items-center justify-center gap-2 py-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-all group"
+                    className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl transition-all group ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'}`}
                   >
                     <svg className="w-4 h-4 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -334,7 +336,7 @@ export default function KanbanBoard({
 
           {/* Add Column Button */}
           <div className="flex-shrink-0 w-80">
-            <button className="w-full h-48 flex flex-col items-center justify-center gap-3 border-2 border-dashed border-white/10 rounded-2xl text-gray-500 hover:text-purple-400 hover:border-purple-500/30 hover:bg-purple-500/5 transition-all group">
+            <button className={`w-full h-48 flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-2xl hover:text-purple-400 hover:border-purple-500/30 hover:bg-purple-500/5 transition-all group ${isDark ? 'border-white/10 text-gray-500' : 'border-gray-200 text-gray-400'}`}>
               <div className="w-12 h-12 rounded-xl bg-white/5 group-hover:bg-purple-500/10 flex items-center justify-center transition-all">
                 <svg className="w-6 h-6 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

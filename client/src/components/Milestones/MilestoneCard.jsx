@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import useThemeStore from '../../stores/themeStore';
 
 /**
  * MilestoneCard - Individual milestone display with progress
@@ -12,6 +13,7 @@ export default function MilestoneCard({
   tasksCompleted = 0,
   totalTasks = 0,
 }) {
+  const isDark = useThemeStore((s) => s.theme) === 'dark';
   const [showMenu, setShowMenu] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -93,7 +95,7 @@ export default function MilestoneCard({
       className={`relative p-4 rounded-xl border transition-all ${
         milestone.completed
           ? 'bg-green-500/5 border-green-500/20'
-          : 'bg-[#1a1a2e] border-white/10 hover:border-purple-500/30'
+          : isDark ? 'bg-[#1a1a2e] border-white/10 hover:border-purple-500/30' : 'bg-white border-gray-200 hover:border-purple-300'
       }`}
     >
       {/* Glow effect on hover */}
@@ -121,7 +123,7 @@ export default function MilestoneCard({
           {/* Title & Status */}
           <div className="flex items-center gap-3 mb-2">
             <h4 className={`font-medium truncate ${
-              milestone.completed ? 'text-gray-500 line-through' : 'text-white'
+              milestone.completed ? 'text-gray-500 line-through' : isDark ? 'text-white' : 'text-gray-900'
             }`}>
               {milestone.title}
             </h4>
@@ -148,7 +150,7 @@ export default function MilestoneCard({
                   {tasksCompleted}/{totalTasks} tasks
                 </span>
               </div>
-              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <div className={`h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
@@ -212,14 +214,14 @@ export default function MilestoneCard({
                     initial={{ opacity: 0, scale: 0.95, y: -10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    className="absolute right-0 bottom-full mb-1 w-36 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-xl z-20 overflow-hidden"
+                    className={`absolute right-0 bottom-full mb-1 w-36 rounded-xl shadow-xl z-20 overflow-hidden ${isDark ? 'bg-[#1a1a2e] border border-white/10' : 'bg-white border border-gray-200'}`}
                   >
                     <button
                       onClick={() => {
                         onEdit?.(milestone);
                         setShowMenu(false);
                       }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-all ${isDark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
