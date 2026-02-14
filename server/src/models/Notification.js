@@ -23,6 +23,7 @@ const notificationSchema = new mongoose.Schema(
         'invitation_declined',    // Someone declined your invitation
         'member_added',           // You were added to a project (direct add)
         'member_removed',         // You were removed from a project
+        'task_assigned',          // A task was assigned to you
         'general',                // General notification
       ],
       required: true,

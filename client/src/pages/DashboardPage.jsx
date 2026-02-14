@@ -316,7 +316,7 @@ export default function DashboardPage() {
                     </div>
                     <div className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
                       <div
-                        className="h-full rounded-full transition-all bg-blue-400"
+                        className="h-full rounded-full transition-all bg-gradient-to-r from-purple-500 to-pink-500"
                         style={{
                           width: `${project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0}%`,
                         }}

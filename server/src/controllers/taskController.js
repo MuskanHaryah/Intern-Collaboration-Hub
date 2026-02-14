@@ -1,11 +1,83 @@
 import Task from '../models/Task.js';
 import Project from '../models/Project.js';
+import Notification from '../models/Notification.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Helper: Update project status based on task progress
+const updateProjectStatus = async (projectId, io) => {
+  try {
+    const project = await Project.findById(projectId);
+    if (!project) return;
+
+    const totalTasks = await Task.countDocuments({ project: projectId, isArchived: false });
+    const doneTasks = await Task.countDocuments({ project: projectId, isArchived: false, column: 'done' });
+
+    let newStatus = project.status;
+
+    if (totalTasks === 0) {
+      newStatus = 'planning';
+    } else if (doneTasks === totalTasks) {
+      newStatus = 'completed';
+    } else if (doneTasks > 0 || totalTasks > 0) {
+      // Check if on-hold: no task completed in last 2 weeks and not all done
+      const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+      const recentlyCompletedTask = await Task.findOne({
+        project: projectId,
+        column: 'done',
+        updatedAt: { $gte: twoWeeksAgo },
+      });
+
+      if (doneTasks > 0 && !recentlyCompletedTask) {
+        newStatus = 'on-hold';
+      } else {
+        newStatus = 'active';
+      }
+    }
+
+    if (project.status !== newStatus) {
+      project.status = newStatus;
+      await project.save();
+      if (io) {
+        io.to(`project-${projectId}`).emit('project:statusUpdated', { projectId, status: newStatus });
+      }
+    }
+  } catch (err) {
+    console.error('Error updating project status:', err);
+  }
+};
+
+// Helper: Send notifications to task assignees
+const notifyAssignees = async (task, assigneeIds, creatorId, projectName, io) => {
+  try {
+    for (const assigneeId of assigneeIds) {
+      // Don't notify the creator/assigner about their own assignment
+      if (assigneeId.toString() === creatorId.toString()) continue;
+
+      const notification = await Notification.create({
+        recipient: assigneeId,
+        sender: creatorId,
+        type: 'task_assigned',
+        project: task.project,
+        message: `You have been assigned to task "${task.title}" in project "${projectName}"`,
+      });
+
+      const populatedNotification = await Notification.findById(notification._id)
+        .populate('sender', 'name email avatar')
+        .populate('project', 'name color');
+
+      if (io) {
+        io.to(`user-${assigneeId}`).emit('notification:new', populatedNotification);
+      }
+    }
+  } catch (err) {
+    console.error('Error sending task assignment notifications:', err);
+  }
+};
 
 // @desc    Create new task
 // @route   POST /api/projects/:projectId/tasks
@@ -61,6 +133,14 @@ export const createTask = async (req, res) => {
     // Emit socket event for real-time update
     const io = req.app.get('io');
     io.to(`project-${projectId}`).emit('task:created', populatedTask);
+
+    // Notify assignees (except the creator)
+    if (assignees && assignees.length > 0) {
+      await notifyAssignees(task, assignees, req.user.id, project.name, io);
+    }
+
+    // Update project status
+    await updateProjectStatus(projectId, io);
 
     res.status(201).json({
       success: true,
@@ -232,6 +312,23 @@ export const updateTask = async (req, res) => {
     const io = req.app.get('io');
     io.to(`project-${task.project}`).emit('task:updated', task);
 
+    // If assignees changed, notify new assignees
+    const assigneeChange = changes.find(c => c.field === 'assignees');
+    if (assigneeChange) {
+      const oldIds = (assigneeChange.from || []).map(id => id.toString());
+      const newIds = (assigneeChange.to || []).map(id => id.toString());
+      const addedIds = newIds.filter(id => !oldIds.includes(id));
+      if (addedIds.length > 0) {
+        await notifyAssignees(task, addedIds, req.user.id, project.name, io);
+      }
+    }
+
+    // If column changed, update project status
+    const columnChange = changes.find(c => c.field === 'column');
+    if (columnChange) {
+      await updateProjectStatus(task.project, io);
+    }
+
     res.status(200).json({
       success: true,
       message: 'Task updated successfully',
@@ -311,6 +408,11 @@ export const moveTask = async (req, res) => {
       oldOrder,
     });
 
+    // Update project status when task moves (e.g., to/from done)
+    if (oldColumn !== column) {
+      await updateProjectStatus(task.project, io);
+    }
+
     res.status(200).json({
       success: true,
       message: 'Task moved successfully',
@@ -355,6 +457,9 @@ export const deleteTask = async (req, res) => {
     // Emit socket event
     const io = req.app.get('io');
     io.to(`project-${projectId}`).emit('task:deleted', req.params.id);
+
+    // Update project status after task deletion
+    await updateProjectStatus(projectId, io);
 
     res.status(200).json({
       success: true,
@@ -711,6 +816,34 @@ export const downloadAttachment = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error downloading file',
+    });
+  }
+};
+
+// @desc    Get all tasks assigned to the current user across all projects
+// @route   GET /api/tasks/my
+// @access  Private
+export const getMyTasks = async (req, res) => {
+  try {
+    const tasks = await Task.find({
+      assignees: req.user.id,
+      isArchived: false,
+    })
+      .populate('assignees', 'name email avatar')
+      .populate('createdBy', 'name email avatar')
+      .populate('project', 'name color status priority')
+      .sort({ updatedAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: tasks.length,
+      data: tasks,
+    });
+  } catch (error) {
+    console.error('Get my tasks error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching your tasks',
     });
   }
 };

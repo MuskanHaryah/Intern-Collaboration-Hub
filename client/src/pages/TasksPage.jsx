@@ -27,31 +27,29 @@ export default function TasksPage() {
       setLoading(true);
       setError(null);
 
-      const projectsRes = await projectService.getAll();
+      // Fetch only tasks assigned to the current user
+      const [myTasksRes, projectsRes] = await Promise.all([
+        taskService.getMyTasks(),
+        projectService.getAll(),
+      ]);
+
       const fetchedProjects = projectsRes.data || [];
       setProjects(fetchedProjects);
 
-      const allTasks = [];
-      for (const project of fetchedProjects) {
-        try {
-          const tasksRes = await taskService.getByProject(project._id);
-          const projectTasks = (tasksRes.data || []).map((t) => ({
-            id: t._id,
-            title: t.title,
-            description: t.description || '',
-            column: t.column || 'backlog',
-            priority: t.priority || 'medium',
-            dueDate: t.dueDate,
-            assignees: t.assignees || [],
-            projectId: project._id,
-            projectName: project.name,
-            projectColor: project.color || '#b026ff',
-          }));
-          allTasks.push(...projectTasks);
-        } catch { /* skip */ }
-      }
+      const myTasks = (myTasksRes.data || []).map((t) => ({
+        id: t._id,
+        title: t.title,
+        description: t.description || '',
+        column: t.column || 'backlog',
+        priority: t.priority || 'medium',
+        dueDate: t.dueDate,
+        assignees: t.assignees || [],
+        projectId: t.project?._id || t.project,
+        projectName: t.project?.name || 'Unknown Project',
+        projectColor: t.project?.color || '#b026ff',
+      }));
 
-      setTasks(allTasks);
+      setTasks(myTasks);
     } catch (err) {
       setError(err.message || 'Failed to load tasks');
     } finally {
@@ -93,7 +91,7 @@ export default function TasksPage() {
   };
 
   return (
-    <DashboardLayout title="My Tasks" subtitle={`${tasks.length} tasks across ${projects.length} projects`}>
+    <DashboardLayout title="My Tasks" subtitle={`${tasks.length} tasks assigned to you`}>
       {loading && <LoadingStates.LoadingOverlay fullScreen message="Loading tasks..." />}
       {error && !loading && <ErrorStates.ErrorMessage message={error} onRetry={fetchAllTasks} />}
 

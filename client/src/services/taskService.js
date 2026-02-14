@@ -2,6 +2,15 @@ import api from './api';
 
 const taskService = {
   /**
+   * Get all tasks assigned to the current user
+   * @returns {Promise} - { success, count, data }
+   */
+  getMyTasks: async () => {
+    const response = await api.get('/tasks/my');
+    return response.data;
+  },
+
+  /**
    * Get all tasks for a project
    * @param {string} projectId
    * @param {Object} params - { column, priority, assignee, search }
