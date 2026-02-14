@@ -21,11 +21,7 @@ export default function KanbanBoard({
   const { editingUsers } = useSocket();
   const [columns, setColumns] = useState(
     initialColumns || [
-      { id: 'backlog', name: 'Backlog', color: '#6b7280', order: 0 },
-      { id: 'todo', name: 'To Do', color: '#3b82f6', order: 1 },
-      { id: 'in-progress', name: 'In Progress', color: '#f59e0b', order: 2 },
-      { id: 'review', name: 'Review', color: '#8b5cf6', order: 3 },
-      { id: 'done', name: 'Done', color: '#10b981', order: 4 },
+      { id: 'todo', name: 'To Do', color: '#3b82f6', order: 0 },
     ]
   );
   
