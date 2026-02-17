@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { motion, AnimatePresence } from 'framer-motion';
 import TaskCard from './TaskCard';
 import AddTaskModal from './AddTaskModal';
+import AddColumnModal from './AddColumnModal';
 import TaskDetailsModal from './TaskDetailsModal';
 import { useSocket } from '../../socket';
 import useThemeStore from '../../stores/themeStore';
@@ -26,6 +27,7 @@ export default function KanbanBoard({
   );
   
   const [showAddTask, setShowAddTask] = useState(null);
+  const [showAddColumn, setShowAddColumn] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPriority, setFilterPriority] = useState('all');
@@ -96,6 +98,17 @@ export default function KanbanBoard({
   const handleTaskUpdate = (updatedTask) => {
     onUpdateTask?.(updatedTask._id || updatedTask.id, updatedTask);
     setSelectedTask(updatedTask);
+  };
+
+  const handleAddColumn = (columnData) => {
+    const newColumn = {
+      id: `col-${Date.now()}`,
+      name: columnData.name,
+      color: columnData.color,
+      order: columns.length,
+    };
+    setColumns([...columns, newColumn]);
+    setShowAddColumn(false);
   };
 
   const totalTasks = tasks?.length || 0;
@@ -218,7 +231,7 @@ export default function KanbanBoard({
               >
                 {/* Column Header */}
                 <div className={`p-4 border-b ${isDark ? 'border-white/10' : 'border-gray-200'}`}>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 mb-1">
                     <div
                       className="w-3 h-3 rounded-full shadow-lg"
                       style={{ 
@@ -231,6 +244,9 @@ export default function KanbanBoard({
                       {columnTasks.length}
                     </span>
                   </div>
+                  <p className={`text-xs ml-6 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                    Drag tasks here
+                  </p>
                 </div>
 
                 {/* Droppable Area */}
@@ -285,7 +301,8 @@ export default function KanbanBoard({
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
                           </div>
-                          <p className="text-sm">No tasks</p>
+                          <p className="text-sm font-medium mb-1">No tasks yet</p>
+                          <p className={`text-xs ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>Drag tasks or add new ones</p>
                         </div>
                       )}
 
@@ -318,16 +335,24 @@ export default function KanbanBoard({
           })}
 
           {/* Add Column Button */}
-          <div className="flex-shrink-0 w-80">
-            <button className={`w-full h-48 flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-2xl hover:text-purple-400 hover:border-purple-500/30 hover:bg-purple-500/5 transition-all group ${isDark ? 'border-white/10 text-gray-500' : 'border-gray-200 text-gray-400'}`}>
-              <div className="w-12 h-12 rounded-xl bg-white/5 group-hover:bg-purple-500/10 flex items-center justify-center transition-all">
-                <svg className="w-6 h-6 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-              </div>
-              <span className="font-medium">Add Column</span>
-            </button>
-          </div>
+          {isOwner && (
+            <div className="flex-shrink-0 w-80">
+              <button 
+                onClick={() => setShowAddColumn(true)}
+                className={`w-full h-48 flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-2xl hover:text-purple-400 hover:border-purple-500/30 hover:bg-purple-500/5 transition-all group ${isDark ? 'border-white/10 text-gray-500' : 'border-gray-200 text-gray-400'}`}
+              >
+                <div className="w-12 h-12 rounded-xl bg-white/5 group-hover:bg-purple-500/10 flex items-center justify-center transition-all">
+                  <svg className="w-6 h-6 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <div className="text-center">
+                  <div className="font-medium mb-1">Add Column</div>
+                  <div className={`text-xs ${isDark ? 'text-gray-600' : 'text-gray-500'}`}>Create workflow stage</div>
+                </div>
+              </button>
+            </div>
+          )}
         </div>
 
       {/* Task Details Modal */}
@@ -347,6 +372,13 @@ export default function KanbanBoard({
         onSubmit={handleAddTask}
         columnId={showAddTask}
         projectMembers={projectMembers}
+      />
+
+      {/* Add Column Modal */}
+      <AddColumnModal
+        isOpen={showAddColumn}
+        onClose={() => setShowAddColumn(false)}
+        onSubmit={handleAddColumn}
       />
     </div>
   );

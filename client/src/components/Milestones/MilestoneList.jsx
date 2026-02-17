@@ -114,11 +114,8 @@ export default function MilestoneList({
             </div>
             <div>
               <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Milestones</h3>
-              <p className="text-sm text-gray-500">
-                {stats.completed} of {stats.total} completed
-                {stats.overdue > 0 && (
-                  <span className="text-red-400 ml-2">• {stats.overdue} overdue</span>
-                )}
+              <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                Track major project goals & deadlines
               </p>
             </div>
           </div>
@@ -126,6 +123,14 @@ export default function MilestoneList({
           <div className="flex items-center gap-3">
             {/* Overall Progress */}
             <div className="hidden sm:flex items-center gap-2">
+              <div className="text-right mr-2">
+                <p className="text-xs text-gray-500">
+                  {stats.completed} of {stats.total}
+                  {stats.overdue > 0 && (
+                    <span className="text-red-400 ml-1">• {stats.overdue} overdue</span>
+                  )}
+                </p>
+              </div>
               <div className={`w-24 h-2 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-gray-200'}`}>
                 <motion.div
                   initial={{ width: 0 }}
