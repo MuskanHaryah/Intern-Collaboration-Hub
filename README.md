@@ -438,11 +438,3 @@ GitHub: [@MuskanHaryah](https://github.com/MuskanHaryah)
 Project Link: [Intern Collaboration Hub](https://github.com/MuskanHaryah/Intern-Collaboration-Hub)
 
 ---
-
-<div align="center">
-
-**Built with ❤️ using the MERN Stack**
-
-*Empowering teams to collaborate seamlessly in real-time*
-
-</div>
