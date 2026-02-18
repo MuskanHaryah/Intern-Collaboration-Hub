@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useThemeStore from '../../stores/themeStore';
+import useAuthStore from '../../stores/authStore';
 
 export default function AddTaskModal({ isOpen, onClose, onSubmit, columnId, projectMembers = [] }) {
   const isDark = useThemeStore((s) => s.theme) === 'dark';
+  const currentUser = useAuthStore((s) => s.user);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -174,7 +176,33 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit, columnId, proj
                 </label>
                 {projectMembers.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
-                    {projectMembers.map((member) => (
+                    {/* Assign to Me button */}
+                    {currentUser && !projectMembers.some(m => m.id === currentUser.id || m.id === currentUser._id) && (
+                      <button
+                        type="button"
+                        onClick={() => toggleAssignee(currentUser.id || currentUser._id)}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all border-dashed ${
+                          formData.assignees.includes(currentUser.id || currentUser._id)
+                            ? 'bg-purple-500/20 border border-purple-500/50 text-purple-400'
+                            : isDark
+                              ? 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10'
+                              : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-medium">
+                          {currentUser.name?.charAt(0) || 'U'}
+                        </div>
+                        <span className="text-sm">{currentUser.name} (Me)</span>
+                        {formData.assignees.includes(currentUser.id || currentUser._id) && (
+                          <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </button>
+                    )}
+                    {projectMembers.map((member) => {
+                      const isMe = currentUser && (member.id === currentUser.id || member.id === currentUser._id);
+                      return (
                       <button
                         key={member.id}
                         type="button"
@@ -190,19 +218,47 @@ export default function AddTaskModal({ isOpen, onClose, onSubmit, columnId, proj
                         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-medium">
                           {member.name?.charAt(0) || 'U'}
                         </div>
-                        <span className="text-sm">{member.name}</span>
+                        <span className="text-sm">{member.name}{isMe ? ' (Me)' : ''}</span>
                         {formData.assignees.includes(member.id) && (
                           <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                         )}
                       </button>
-                    ))}
+                    );
+                    })}
                   </div>
                 ) : (
-                  <p className={`text-sm italic ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                    No project members to assign. Invite members to the project first.
-                  </p>
+                  <div>
+                    {currentUser && (
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        <button
+                          type="button"
+                          onClick={() => toggleAssignee(currentUser.id || currentUser._id)}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+                            formData.assignees.includes(currentUser.id || currentUser._id)
+                              ? 'bg-purple-500/20 border border-purple-500/50 text-purple-400'
+                              : isDark
+                                ? 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10'
+                                : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-medium">
+                            {currentUser.name?.charAt(0) || 'U'}
+                          </div>
+                          <span className="text-sm">{currentUser.name} (Me)</span>
+                          {formData.assignees.includes(currentUser.id || currentUser._id) && (
+                            <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    )}
+                    <p className={`text-sm italic ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                      Invite members to the project to assign tasks to them.
+                    </p>
+                  </div>
                 )}
               </div>
 

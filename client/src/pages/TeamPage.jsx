@@ -4,16 +4,19 @@ import DashboardLayout from '../components/Layout/DashboardLayout';
 import useThemeStore from '../stores/themeStore';
 import useAuthStore from '../stores/authStore';
 import { projectService } from '../services';
-import { LoadingStates, ErrorStates } from '../components/UI';
+import { LoadingStates, ErrorStates, ConfirmationModal } from '../components/UI';
 import TeamInviteModal from '../components/UI/TeamInviteModal';
 
 export default function TeamPage() {
   const [members, setMembers] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [inviteOpen, setInviteOpen] = useState(false);
   const [isProjectOwner, setIsProjectOwner] = useState(false);
+  const [removeConfirm, setRemoveConfirm] = useState({ open: false, member: null });
+  const [removing, setRemoving] = useState(false);
 
   const theme = useThemeStore((s) => s.theme);
   const isDark = theme === 'dark';
@@ -30,6 +33,7 @@ export default function TeamPage() {
 
       const projectsRes = await projectService.getAll();
       const fetchedProjects = projectsRes.data || [];
+      setProjects(fetchedProjects);
 
       // Check if current user owns any project
       const ownsProject = fetchedProjects.some((p) => {
@@ -90,6 +94,34 @@ export default function TeamPage() {
       setError(err.message || 'Failed to load team members');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRemoveMember = async () => {
+    if (!removeConfirm.member) return;
+    setRemoving(true);
+    try {
+      const member = removeConfirm.member;
+      // Remove from all projects where this member exists
+      for (const proj of member.projects) {
+        // Only remove if current user owns this project
+        const project = projects.find((p) => (p._id || p.id) === proj.id);
+        if (!project) continue;
+        const ownerId = project.owner?._id || project.owner;
+        if (ownerId === currentUser?.id || ownerId === currentUser?._id) {
+          try {
+            await projectService.removeMember(proj.id, member.id);
+          } catch (err) {
+            console.error(`Failed to remove from project ${proj.name}:`, err);
+          }
+        }
+      }
+      setRemoveConfirm({ open: false, member: null });
+      fetchTeamMembers(); // refresh
+    } catch (err) {
+      console.error('Remove member error:', err);
+    } finally {
+      setRemoving(false);
     }
   };
 
@@ -231,7 +263,7 @@ export default function TeamPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className={`rounded-2xl p-5 border transition-all hover:scale-[1.01] ${
+                  className={`group rounded-2xl p-5 border transition-all hover:scale-[1.01] ${
                     isDark
                       ? 'bg-[#12121a] border-white/10 hover:border-purple-500/30'
                       : 'bg-white border-gray-200 hover:border-purple-200 shadow-sm hover:shadow-md'
@@ -265,6 +297,21 @@ export default function TeamPage() {
                         </span>
                       </div>
                     </div>
+
+                    {/* Remove button - only for project owners, not on self or other owners */}
+                    {isProjectOwner && member.role !== 'Owner' && member.id !== currentUser?.id && member.id !== currentUser?._id && (
+                      <button
+                        onClick={() => setRemoveConfirm({ open: true, member })}
+                        className={`flex-shrink-0 p-1.5 rounded-lg transition-all opacity-0 group-hover:opacity-100 ${
+                          isDark ? 'hover:bg-red-500/10 text-gray-500 hover:text-red-400' : 'hover:bg-red-50 text-gray-400 hover:text-red-500'
+                        }`}
+                        title="Remove member"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
                   </div>
 
                   {/* Projects */}
@@ -298,6 +345,18 @@ export default function TeamPage() {
           )}
         </>
       )}
+
+      {/* Remove Member Confirmation */}
+      <ConfirmationModal
+        isOpen={removeConfirm.open}
+        onClose={() => setRemoveConfirm({ open: false, member: null })}
+        onConfirm={handleRemoveMember}
+        title="Remove Team Member"
+        message={`Are you sure you want to remove ${removeConfirm.member?.name} from all your projects? This action cannot be undone.`}
+        confirmText={removing ? 'Removing...' : 'Remove'}
+        variant="danger"
+        isLoading={removing}
+      />
     </DashboardLayout>
   );
 }
